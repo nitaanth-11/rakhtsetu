@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Request Blood</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f4f4;
+text-align:center;
+}
+
+form{
+background:white;
+width:350px;
+margin:auto;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 10px gray;
+}
+
+input,select{
+width:90%;
+padding:10px;
+margin:6px;
+}
+
+button{
+padding:10px 20px;
+background:#b30000;
+color:white;
+border:none;
+cursor:pointer;
+border-radius:6px;
+}
+
+#results{
+margin-top:30px;
+}
+
+.card{
+background:white;
+width:320px;
+margin:12px auto;
+padding:15px;
+border-radius:10px;
+box-shadow:0 0 10px gray;
+text-align:left;
+}
+
+.card button{
+margin-top:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>Blood Request</h2>
+
+<form id="requestForm">
+
+<input type="text" id="patient_name" placeholder="Patient Name" required>
+
+<input type="text" id="blood_type" placeholder="Blood Type" required>
+
+<input type="number" id="units" placeholder="Units Required" required>
+
+<select id="urgency" required>
+<option value="">Select Urgency</option>
+<option value="normal">Normal</option>
+<option value="emergency">Emergency</option>
+</select>
+
+<br>
+
+<button type="button" onclick="getLocation()">Detect My Location</button>
+
+<br><br>
+
+<input type="text" id="latitude" placeholder="Latitude" readonly>
+
+<input type="text" id="longitude" placeholder="Longitude" readonly>
+
+<br><br>
+
+<button type="submit">Find Donors</button>
+
+</form>
+
+<div id="results"></div>
+
+<script>
+
+function getLocation(){
+
+if(navigator.geolocation){
+
+navigator.geolocation.getCurrentPosition(function(position){
+
+document.getElementById("latitude").value = position.coords.latitude
+document.getElementById("longitude").value = position.coords.longitude
+
+})
+
+}else{
+
+alert("Geolocation not supported")
+
+}
+
+}
+
+document.getElementById("requestForm").addEventListener("submit",async function(e){
+
+e.preventDefault()
+
+const data = {
+
+patient_name: document.getElementById("patient_name").value,
+blood_type: document.getElementById("blood_type").value,
+units: parseInt(document.getElementById("units").value),
+latitude: parseFloat(document.getElementById("latitude").value),
+longitude: parseFloat(document.getElementById("longitude").value),
+urgency: document.getElementById("urgency").value
+
+}
+
+const response = await fetch("http://127.0.0.1:8000/request_blood",{
+
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+
+body: JSON.stringify(data)
+
+})
+
+const result = await response.json()
+
+displayResults(result)
+
+})
+
+function displayResults(data){
+
+const container = document.getElementById("results")
+
+container.innerHTML = "<h3>Nearest Donors</h3>"
+
+data.nearest_donors.forEach(donor => {
+
+const card = document.createElement("div")
+
+card.className = "card"
+
+card.innerHTML = `
+<b>Name:</b> ${donor.name}<br>
+<b>Blood Type:</b> ${donor.blood_type}<br>
+<b>Phone:</b> ${donor.phone}<br>
+<b>Distance:</b> ${donor.distance_km} km<br>
+
+<button onclick='selectDonor(${JSON.stringify(donor)})'>
+Request From Donor
+</button>
+`
+
+container.appendChild(card)
+
+})
+
+}
+
+function selectDonor(donor){
+
+const confirmRequest = confirm(
+`Request blood from ${donor.name}?`
+)
+
+if(confirmRequest){
+
+localStorage.setItem("selectedDonor", JSON.stringify(donor))
+
+window.location.href = "confirm_request.html"
+
+}
+
+}
+
+</script>
+
+</body>
+
+</html>

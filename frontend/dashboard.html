@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>RakhtSetu Dashboard</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#f4f4f4;
+}
+
+/* Top Bar */
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:#b30000;
+color:white;
+padding:15px 25px;
+font-size:22px;
+}
+
+/* Profile Menu */
+
+.profile-menu{
+position:relative;
+}
+
+.profile-menu button{
+background:white;
+color:#b30000;
+border:none;
+padding:8px 14px;
+border-radius:6px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.dropdown{
+display:none;
+position:absolute;
+right:0;
+top:40px;
+background:white;
+box-shadow:0 0 10px gray;
+border-radius:6px;
+overflow:hidden;
+}
+
+.dropdown a{
+display:block;
+padding:10px 20px;
+text-decoration:none;
+color:black;
+}
+
+.dropdown a:hover{
+background:#eee;
+}
+
+/* Cards */
+
+.container{
+display:flex;
+justify-content:center;
+gap:30px;
+margin-top:40px;
+flex-wrap:wrap;
+}
+
+.card{
+background:white;
+padding:25px;
+width:220px;
+text-align:center;
+border-radius:12px;
+box-shadow:0 0 12px rgba(0,0,0,0.2);
+}
+
+.card h3{
+margin-bottom:15px;
+}
+
+.card button{
+padding:10px 18px;
+background:#b30000;
+color:white;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+/* Map */
+
+#map{
+height:450px;
+margin:40px;
+border-radius:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="topbar">
+
+<div>RakhtSetu Dashboard</div>
+
+<div class="profile-menu">
+
+<button onclick="toggleProfile()">👤 Profile</button>
+
+<div id="profileDropdown" class="dropdown">
+
+<a href="profile.html">My Profile</a>
+
+<a href="login.html" onclick="logout()">Logout</a>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container">
+
+<div class="card">
+<h3>Request Blood</h3>
+<button onclick="location.href='request.html'">Open</button>
+</div>
+
+<div class="card">
+<h3>Hospitals</h3>
+<button onclick="toggleHospitals()">Find</button>
+</div>
+
+<div class="card">
+<h3>Clinics</h3>
+<button onclick="toggleClinics()">Find</button>
+</div>
+
+<div class="card">
+<h3>Blood Banks</h3>
+<button onclick="toggleBloodBanks()">Find</button>
+</div>
+
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+/* LOGIN PROTECTION */
+
+if(!localStorage.getItem("donor")){
+window.location.href="login.html"
+}
+
+/* Logout */
+
+function logout(){
+localStorage.removeItem("donor")
+}
+
+/* Profile Dropdown */
+
+function toggleProfile(){
+
+const menu = document.getElementById("profileDropdown")
+
+menu.style.display = menu.style.display === "block" ? "none" : "block"
+
+}
+
+/* Map Variables */
+
+let map
+let userLat
+let userLon
+
+let hospitalMarkers=[]
+let clinicMarkers=[]
+let bloodBankMarkers=[]
+
+let hospitalsVisible=false
+let clinicsVisible=false
+let bloodBanksVisible=false
+
+/* Marker Icons */
+
+const hospitalIcon = new L.Icon({
+iconUrl:"https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
+shadowUrl:"https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+iconSize:[25,41],
+iconAnchor:[12,41],
+popupAnchor:[1,-34],
+shadowSize:[41,41]
+})
+
+const clinicIcon = new L.Icon({
+iconUrl:"https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png",
+shadowUrl:"https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+iconSize:[25,41],
+iconAnchor:[12,41],
+popupAnchor:[1,-34],
+shadowSize:[41,41]
+})
+
+const bloodBankIcon = new L.Icon({
+iconUrl:"https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+shadowUrl:"https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+iconSize:[25,41],
+iconAnchor:[12,41],
+popupAnchor:[1,-34],
+shadowSize:[41,41]
+})
+
+/* Initialize Map */
+
+navigator.geolocation.getCurrentPosition(function(pos){
+
+userLat = pos.coords.latitude
+userLon = pos.coords.longitude
+
+map = L.map('map').setView([userLat,userLon],13)
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+attribution:'© OpenStreetMap'
+}).addTo(map)
+
+L.marker([userLat,userLon])
+.addTo(map)
+.bindPopup("📍 You are here")
+.openPopup()
+
+})
+
+/* Search Places */
+
+async function searchPlaces(type, icon, markerArray){
+
+const radius = 3000
+
+const query = `
+[out:json];
+node
+["amenity"="${type}"]
+(around:${radius},${userLat},${userLon});
+out;
+`
+
+const url = "https://overpass-api.de/api/interpreter?data=" + encodeURIComponent(query)
+
+const res = await fetch(url)
+const data = await res.json()
+
+data.elements.forEach(place => {
+
+const lat = place.lat
+const lon = place.lon
+const name = place.tags.name || type
+
+const marker = L.marker([lat,lon],{icon:icon})
+.addTo(map)
+.bindPopup(name)
+
+markerArray.push(marker)
+
+})
+
+}
+
+/* Toggle Hospitals */
+
+async function toggleHospitals(){
+
+if(hospitalsVisible){
+
+hospitalMarkers.forEach(m => map.removeLayer(m))
+hospitalMarkers=[]
+hospitalsVisible=false
+return
+
+}
+
+await searchPlaces("hospital",hospitalIcon,hospitalMarkers)
+
+hospitalsVisible=true
+
+}
+
+/* Toggle Clinics */
+
+async function toggleClinics(){
+
+if(clinicsVisible){
+
+clinicMarkers.forEach(m => map.removeLayer(m))
+clinicMarkers=[]
+clinicsVisible=false
+return
+
+}
+
+await searchPlaces("clinic",clinicIcon,clinicMarkers)
+
+clinicsVisible=true
+
+}
+
+/* Toggle Blood Banks */
+
+async function toggleBloodBanks(){
+
+if(bloodBanksVisible){
+
+bloodBankMarkers.forEach(m => map.removeLayer(m))
+bloodBankMarkers=[]
+bloodBanksVisible=false
+return
+
+}
+
+await searchPlaces("blood_bank",bloodBankIcon,bloodBankMarkers)
+
+bloodBanksVisible=true
+
+}
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Register Donor</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f4f4;
+text-align:center;
+}
+
+form{
+background:white;
+width:350px;
+margin:auto;
+margin-top:80px;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 10px gray;
+}
+
+input{
+width:90%;
+padding:10px;
+margin:6px;
+}
+
+button{
+padding:10px 20px;
+background:#b30000;
+color:white;
+border:none;
+cursor:pointer;
+border-radius:6px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>Donor Registration</h2>
+
+<form id="donorForm">
+
+<input type="text" id="name" placeholder="Name" required>
+
+<input type="number" id="age" placeholder="Age" required>
+
+<input type="text" id="blood_type" placeholder="Blood Type" required>
+
+<input type="text" id="phone" placeholder="Phone Number" required>
+
+<input type="password" id="password" placeholder="Password" required>
+
+<br>
+
+<button type="button" onclick="getLocation()">Detect My Location</button>
+
+<br><br>
+
+<input type="text" id="latitude" placeholder="Latitude" readonly>
+
+<input type="text" id="longitude" placeholder="Longitude" readonly>
+
+<br><br>
+
+<button type="submit">Register</button>
+
+</form>
+
+<script>
+
+/* Detect location */
+
+function getLocation(){
+
+navigator.geolocation.getCurrentPosition(function(pos){
+
+document.getElementById("latitude").value = pos.coords.latitude
+document.getElementById("longitude").value = pos.coords.longitude
+
+})
+
+}
+
+/* Register donor */
+
+document.getElementById("donorForm").addEventListener("submit", async function(e){
+
+e.preventDefault()
+
+const data = {
+
+name: document.getElementById("name").value,
+age: parseInt(document.getElementById("age").value),
+blood_type: document.getElementById("blood_type").value,
+phone: document.getElementById("phone").value,
+password: document.getElementById("password").value,
+latitude: parseFloat(document.getElementById("latitude").value),
+longitude: parseFloat(document.getElementById("longitude").value),
+available: true
+
+}
+
+const res = await fetch("http://127.0.0.1:8000/register_donor",{
+
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+
+body: JSON.stringify(data)
+
+})
+
+const result = await res.json()
+
+localStorage.setItem("donor", JSON.stringify(data))
+
+alert("Registration successful!")
+
+window.location.href="dashboard.html"
+
+})
+
+</script>
+
+</body>
+
+</html>

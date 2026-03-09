@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>My Profile</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f4f4;
+margin:0;
+}
+
+/* Header */
+
+.header{
+background:#b30000;
+color:white;
+padding:15px;
+text-align:center;
+font-size:24px;
+}
+
+/* Profile Container */
+
+.container{
+width:420px;
+margin:auto;
+margin-top:40px;
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 0 12px rgba(0,0,0,0.2);
+}
+
+/* Profile Info */
+
+.info{
+margin-bottom:15px;
+font-size:18px;
+}
+
+/* Donation Section */
+
+.history{
+margin-top:25px;
+}
+
+.card{
+
+background:#f4f4f4;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+
+}
+
+/* Button */
+
+button{
+
+margin-top:20px;
+padding:10px 18px;
+background:#b30000;
+color:white;
+border:none;
+border-radius:6px;
+cursor:pointer;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+My Profile
+</div>
+
+<div class="container">
+
+<h2 id="name"></h2>
+
+<div class="info">
+<b>Blood Type:</b> <span id="blood"></span>
+</div>
+
+<div class="info">
+<b>Phone:</b> <span id="phone"></span>
+</div>
+
+<div class="info">
+<b>Latitude:</b> <span id="lat"></span>
+</div>
+
+<div class="info">
+<b>Longitude:</b> <span id="lon"></span>
+</div>
+
+<div class="history">
+
+<h3>Donation History</h3>
+
+<div id="historyList">
+
+<div class="card">
+Hospital: City Hospital  
+Date: 2024-10-12
+</div>
+
+<div class="card">
+Hospital: Metro Blood Bank  
+Date: 2024-07-02
+</div>
+
+</div>
+
+</div>
+
+<button onclick="goBack()">Back to Dashboard</button>
+
+</div>
+
+<script>
+
+/* Load donor info */
+
+const donor = JSON.parse(localStorage.getItem("donor"))
+
+if(donor){
+
+document.getElementById("name").innerText = donor.name
+document.getElementById("blood").innerText = donor.blood_type
+document.getElementById("phone").innerText = donor.phone
+document.getElementById("lat").innerText = donor.latitude
+document.getElementById("lon").innerText = donor.longitude
+
+}
+
+/* Back button */
+
+function goBack(){
+
+window.location.href = "dashboard.html"
+
+}
+
+</script>
+
+</body>
+
+</html>
