@@ -135,6 +135,23 @@ def api_banks():
     })
 
 
+@app.route("/api/ambulances")
+def api_ambulances():
+    """
+    Return nearest ambulances enriched with distance, cost_per_km, rating, total_cost.
+    Query params: lat (float), lng (float), n (int, default 5)
+    """
+    try:
+        lat = float(request.args["lat"])
+        lng = float(request.args["lng"])
+    except (KeyError, ValueError):
+        return jsonify({"error": "lat and lng query params required"}), 400
+
+    n = int(request.args.get("n", 5))
+    units = nearest_ambulances(lat, lng, n=n)
+    return jsonify({"ambulances": units})
+
+
 # ─────────────────────────────────────────────────────────────────
 #  Blood request lifecycle
 # ─────────────────────────────────────────────────────────────────

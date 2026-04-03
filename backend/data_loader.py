@@ -13,7 +13,14 @@ from typing import List, Dict, Tuple, Optional
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 BLOOD_BANKS_CSV  = os.path.join(BASE_DIR, "blood_banks.csv")
-AMBULANCES_CSV   = os.path.join(BASE_DIR, "ambulances.csv")
+
+# Prefer backend/ambulances.csv; fall back to root ambulances_updated.csv
+_ambu_candidates = [
+    os.path.join(BASE_DIR, "ambulances.csv"),
+    os.path.join(BASE_DIR, "..", "ambulances_updated.csv"),
+    os.path.join(BASE_DIR, "..", "dataset", "ambulances.csv"),
+]
+AMBULANCES_CSV = next((p for p in _ambu_candidates if os.path.exists(p)), _ambu_candidates[0])
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -43,14 +50,18 @@ def load_ambulances() -> List[Dict]:
     with open(AMBULANCES_CSV, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
+            if not row.get("name", "").strip():
+                continue  # skip blank trailing rows
             units.append({
-                "name":     row["name"].strip(),
-                "lat":      float(row["lat"]),
-                "lng":      float(row["lng"]),
-                "area":     row["area"].strip(),
-                "phone":    row["phone"].strip(),
-                "type":     row["type"].strip(),      # "ambulance" | "mobile_van"
-                "capacity": int(row["capacity"]),
+                "name":        row["name"].strip(),
+                "lat":         float(row["lat"]),
+                "lng":         float(row["lng"]),
+                "area":        row["area"].strip(),
+                "phone":       row["phone"].strip(),
+                "type":        row["type"].strip(),      # "ambulance" | "mobile_van"
+                "capacity":    int(row["capacity"]),
+                "cost_per_km": float(row.get("cost_per_km", 30)),
+                "rating":      float(row.get("rating", 4.0)),
             })
     return units
 
@@ -84,14 +95,19 @@ def nearest_blood_banks(lat: float, lng: float, n: int = 5) -> List[Dict]:
 def nearest_ambulances(lat: float, lng: float, n: int = 3,
                        unit_type: Optional[str] = None) -> List[Dict]:
     """
-    Return the N closest ambulances / mobile vans.
+    Return the N closest ambulances / mobile vans enriched with
+    distance_km and total_cost (cost_per_km × distance_km).
     Pass unit_type='ambulance' or 'mobile_van' to filter.
     """
     units = load_ambulances()
     if unit_type:
         units = [u for u in units if u["type"] == unit_type]
     for u in units:
-        u["distance_m"] = haversine(lat, lng, u["lat"], u["lng"])
+        dist_m = haversine(lat, lng, u["lat"], u["lng"])
+        dist_km = round(dist_m / 1000, 2)
+        u["distance_m"]  = round(dist_m)
+        u["distance_km"] = dist_km
+        u["total_cost"]  = round(u["cost_per_km"] * dist_km, 2)
     return sorted(units, key=lambda x: x["distance_m"])[:n]
 
 
