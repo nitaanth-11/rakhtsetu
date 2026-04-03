@@ -1,77 +1,440 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
-<title>RakhtSetu</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RakhtSetu · Request Blood</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
-
-body{
-font-family:Arial;
-background:#eaeaea;
-text-align:center;
-margin-top:120px;
+:root {
+  --red:        #c0392b;
+  --red-bright: #e74c3c;
+  --red-dim:    #7b1c1c;
+  --red-glow:   rgba(192,57,43,0.35);
+  --bg:         #080b0e;
+  --panel:      #0e1318;
+  --panel2:     #141b22;
+  --border:     #1e2a35;
+  --text:       #d4dde8;
+  --muted:      #566879;
+  --mono:       'Share Tech Mono', monospace;
+  --head:       'Rajdhani', sans-serif;
+  --body:       'Inter', sans-serif;
 }
 
-h1{
-color:#b30000;
-font-size:60px;
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--body);overflow:hidden}
+
+/* ── layout ── */
+.shell{display:flex;height:100vh}
+
+/* ── sidebar ── */
+#sidebar{
+  width:420px;min-width:420px;
+  background:var(--panel);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow:hidden;
 }
 
-h3{
-margin-bottom:50px;
+.sidebar-head{
+  padding:28px 28px 20px;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(135deg,#0c1219 0%,#101820 100%);
 }
-
-button{
-
-padding:18px 35px;
-font-size:18px;
-background:#b30000;
-color:white;
-border:none;
-border-radius:12px;
-cursor:pointer;
-margin:20px;
-
+.logo{
+  font-family:var(--head);font-size:1.75rem;font-weight:700;
+  color:var(--red-bright);letter-spacing:3px;text-transform:uppercase;
+  display:flex;align-items:center;gap:10px;
 }
-
-.login-line{
-margin-top:30px;
-font-size:18px;
+.logo-drop{
+  width:10px;height:10px;background:var(--red-bright);
+  border-radius:50%;animation:pulse 1.6s ease-in-out infinite;
+  box-shadow:0 0 0 0 var(--red-glow);
 }
-
-.login-line a{
-color:#b30000;
-font-weight:bold;
-text-decoration:none;
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 var(--red-glow)}
+  70%{box-shadow:0 0 0 10px rgba(0,0,0,0)}
+  100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}
 }
+.tagline{font-size:.7rem;color:var(--muted);letter-spacing:2px;margin-top:4px;font-family:var(--mono)}
 
+.sidebar-body{flex:1;overflow-y:auto;padding:24px 28px}
+.sidebar-body::-webkit-scrollbar{width:4px}
+.sidebar-body::-webkit-scrollbar-thumb{background:var(--red-dim);border-radius:2px}
+
+/* ── form ── */
+.section-label{
+  font-family:var(--mono);font-size:.65rem;letter-spacing:3px;
+  color:var(--red-bright);text-transform:uppercase;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.field{margin-bottom:18px}
+.field label{
+  display:block;font-size:.72rem;color:var(--muted);
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;
+  font-family:var(--mono);
+}
+.field input,.field select,.field textarea{
+  width:100%;padding:11px 14px;
+  background:var(--panel2);border:1px solid var(--border);
+  color:var(--text);font-family:var(--body);font-size:.9rem;
+  border-radius:3px;transition:border-color .2s,box-shadow .2s;
+  appearance:none;
+}
+.field input:focus,.field select:focus{
+  outline:none;border-color:var(--red-dim);
+  box-shadow:0 0 0 3px rgba(192,57,43,0.15);
+}
+.field select option{background:#1a242f}
+
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+.loc-display{
+  background:var(--panel2);border:1px solid var(--border);
+  border-radius:3px;padding:11px 14px;
+  font-family:var(--mono);font-size:.8rem;color:var(--muted);
+  min-height:42px;display:flex;align-items:center;gap:8px;
+}
+.loc-display .dot{width:6px;height:6px;background:var(--red-bright);border-radius:50%;flex-shrink:0}
+.loc-display.active{color:var(--text);border-color:var(--red-dim)}
+
+.btn-gps{
+  width:100%;padding:10px;margin-bottom:6px;
+  background:transparent;border:1px solid var(--border);
+  color:var(--muted);border-radius:3px;cursor:pointer;
+  font-family:var(--mono);font-size:.75rem;letter-spacing:1px;
+  transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-gps:hover{border-color:var(--red-dim);color:var(--text)}
+
+.btn-submit{
+  width:100%;padding:15px;margin-top:8px;
+  background:var(--red);border:none;color:#fff;
+  font-family:var(--head);font-size:1.1rem;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;
+  border-radius:3px;cursor:pointer;transition:.25s;
+  position:relative;overflow:hidden;
+}
+.btn-submit:hover{background:var(--red-bright);box-shadow:0 0 20px var(--red-glow)}
+.btn-submit:active{transform:scale(0.99)}
+.btn-submit::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent);
+  transform:translateX(-100%);
+}
+.btn-submit:hover::after{animation:shimmer .6s ease forwards}
+@keyframes shimmer{to{transform:translateX(100%)}}
+
+/* urgency badges */
+.urg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.urg-opt{
+  padding:10px 4px;text-align:center;border:1px solid var(--border);
+  border-radius:3px;cursor:pointer;font-family:var(--mono);font-size:.7rem;
+  letter-spacing:1px;color:var(--muted);transition:.2s;
+}
+.urg-opt:hover{border-color:var(--muted)}
+.urg-opt.active{color:#fff}
+.urg-opt[data-u="Normal"].active{background:#1a3a2a;border-color:#2e7d32;color:#66bb6a}
+.urg-opt[data-u="Urgent"].active{background:#2d2000;border-color:#f57f17;color:#ffca28}
+.urg-opt[data-u="Critical"].active{background:#2d0000;border-color:var(--red);color:var(--red-bright)}
+
+/* ── status toast ── */
+#toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--panel2);border:1px solid var(--border);
+  padding:14px 22px;border-radius:4px;font-family:var(--mono);font-size:.78rem;
+  opacity:0;transition:.4s;z-index:9999;max-width:380px;text-align:center;
+  pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.ok{border-color:#2e7d32;color:#66bb6a}
+#toast.err{border-color:var(--red-dim);color:var(--red-bright)}
+
+/* ── result card ── */
+#result-card{
+  display:none;background:var(--panel2);border:1px solid var(--red-dim);
+  border-radius:4px;padding:18px;margin-top:18px;
+}
+.result-id{
+  font-family:var(--mono);font-size:1.6rem;font-weight:700;
+  color:var(--red-bright);letter-spacing:4px;margin-bottom:6px;
+}
+.result-sub{font-size:.75rem;color:var(--muted);margin-bottom:14px}
+.nearby-list{list-style:none}
+.nearby-list li{
+  padding:8px 0;border-bottom:1px solid var(--border);
+  font-size:.78rem;display:flex;justify-content:space-between;align-items:center;
+}
+.nearby-list li:last-child{border:none}
+.nearby-dist{font-family:var(--mono);color:var(--red-bright);font-size:.7rem}
+
+.link-btn{
+  display:inline-block;margin-top:12px;padding:10px 20px;
+  background:transparent;border:1px solid var(--red-dim);
+  color:var(--red-bright);font-family:var(--mono);font-size:.75rem;
+  letter-spacing:2px;text-decoration:none;border-radius:3px;
+  transition:.2s;cursor:pointer;text-align:center;
+}
+.link-btn:hover{background:var(--red-dim);color:#fff}
+
+/* ── map ── */
+#map{flex:1;height:100%}
+.leaflet-tile-pane{filter:brightness(.5) saturate(.4) hue-rotate(190deg)}
+
+/* ── map pulse marker ── */
+.user-pulse{
+  width:16px;height:16px;border-radius:50%;
+  background:rgba(231,76,60,.9);
+  box-shadow:0 0 0 0 rgba(231,76,60,.5);
+  animation:mapPulse 1.5s infinite;
+}
+@keyframes mapPulse{
+  0%{box-shadow:0 0 0 0 rgba(231,76,60,.5)}
+  70%{box-shadow:0 0 0 14px rgba(231,76,60,0)}
+  100%{box-shadow:0 0 0 0 rgba(231,76,60,0)}
+}
+.bank-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:#8a0303;border:1.5px solid rgba(255,255,255,.4);
+  box-shadow:0 0 4px rgba(192,57,43,.6);
+}
+.ambu-dot{
+  width:12px;height:12px;border-radius:2px;
+  background:#1565c0;border:1.5px solid rgba(100,181,246,.5);
+  box-shadow:0 0 4px rgba(21,101,192,.6);
+}
 </style>
-
 </head>
-
 <body>
+<div class="shell">
 
-<h1>RakhtSetu</h1>
+<!-- ── SIDEBAR ── -->
+<div id="sidebar">
+  <div class="sidebar-head">
+    <div class="logo"><span class="logo-drop"></span>RakhtSetu</div>
+    <div class="tagline">MUMBAI BLOOD GRID · REQUEST NODE</div>
+  </div>
 
-<h3>Optimized Blood Access Engine</h3>
+  <div class="sidebar-body">
 
-<button onclick="location.href='donor.html'">
-Register as Donor
-</button>
+    <!-- GPS -->
+    <div class="field" style="margin-bottom:20px">
+      <button class="btn-gps" id="gps-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
+        USE LIVE GPS
+      </button>
+    </div>
 
-<button onclick="location.href='request.html'">
-Request Blood
-</button>
+    <div class="section-label">PATIENT INFO</div>
 
-<div class="login-line">
+    <div class="field">
+      <label>Full Name</label>
+      <input type="text" id="f-name" placeholder="Patient name" required>
+    </div>
 
-Already registered? 
-<a href="login.html">Login here</a>
+    <div class="row-2">
+      <div class="field">
+        <label>Blood Type</label>
+        <select id="f-blood">
+          <option>A+</option><option>A-</option>
+          <option>B+</option><option>B-</option>
+          <option>O+</option><option>O-</option>
+          <option>AB+</option><option>AB-</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Units Needed</label>
+        <input type="number" id="f-units" value="1" min="1" max="10">
+      </div>
+    </div>
 
-</div>
+    <div class="field">
+      <label>Hospital / Area Name</label>
+      <input type="text" id="f-label" placeholder="e.g. KEM Hospital, Parel">
+    </div>
 
+    <div class="section-label" style="margin-top:4px">URGENCY</div>
+    <div class="urg-grid" style="margin-bottom:20px">
+      <div class="urg-opt" data-u="Normal">NORMAL</div>
+      <div class="urg-opt active" data-u="Urgent">URGENT</div>
+      <div class="urg-opt" data-u="Critical">CRITICAL</div>
+    </div>
+    <input type="hidden" id="f-urgency" value="Urgent">
+
+    <div class="section-label">LOCATION</div>
+    <div class="loc-display" id="loc-display">
+      <span class="dot"></span>
+      <span id="loc-text">Click map or use GPS to pin location</span>
+    </div>
+    <input type="hidden" id="f-lat">
+    <input type="hidden" id="f-lng">
+
+    <button class="btn-submit" id="submit-btn" style="margin-top:20px">
+      ▲ POST BLOOD REQUEST
+    </button>
+
+    <!-- Result card shown after successful post -->
+    <div id="result-card">
+      <div class="result-id" id="r-id"></div>
+      <div class="result-sub">Request ID — share with hospital staff</div>
+      <div class="section-label" style="margin-top:2px">NEAREST BLOOD BANKS</div>
+      <ul class="nearby-list" id="r-banks"></ul>
+      <div class="section-label" style="margin-top:10px">NEAREST AMBULANCES</div>
+      <ul class="nearby-list" id="r-ambs"></ul>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+        <a href="dashboard.html" class="link-btn" style="flex:1">→ LIVE FEED</a>
+        <a id="r-chat" href="#" class="link-btn" style="flex:1">💬 OPEN CHAT</a>
+      </div>
+    </div>
+
+  </div><!-- sidebar-body -->
+</div><!-- sidebar -->
+
+<!-- ── MAP ── -->
+<div id="map"></div>
+
+</div><!-- shell -->
+<div id="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const API = "http://localhost:5000";
+
+// ── Map ──────────────────────────────────────────────────────────
+const map = L.map('map', {zoomControl:false}).setView([19.076, 72.877], 12);
+L.control.zoom({position:'bottomright'}).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  {attribution:'© OpenStreetMap'}).addTo(map);
+
+const bankIcon = L.divIcon({className:'',html:'<div class="bank-dot"></div>',iconSize:[10,10]});
+const ambuIcon = L.divIcon({className:'',html:'<div class="ambu-dot"></div>',iconSize:[12,12]});
+
+// Load markers from backend
+fetch(`${API}/api/banks`).then(r=>r.json()).then(d=>{
+  d.blood_banks.forEach(b=>{
+    L.marker([b.lat,b.lng],{icon:bankIcon}).addTo(map)
+     .bindPopup(`<b>${b.name}</b><br>${b.address}<br>📞 ${b.phone}`,
+       {className:'dark-popup'});
+  });
+  d.ambulances.forEach(a=>{
+    L.marker([a.lat,a.lng],{icon:ambuIcon}).addTo(map)
+     .bindPopup(`<b>${a.name}</b><br>Type: ${a.type}<br>📞 ${a.phone}`,
+       {className:'dark-popup'});
+  });
+}).catch(()=>console.warn("Backend offline — markers skipped"));
+
+// ── User location pin ────────────────────────────────────────────
+let userMarker = null;
+let userLat = null, userLng = null;
+const userIcon = L.divIcon({className:'',html:'<div class="user-pulse"></div>',iconSize:[16,16]});
+
+function setLocation(lat, lng, fly=false){
+  userLat = lat; userLng = lng;
+  document.getElementById('f-lat').value = lat;
+  document.getElementById('f-lng').value = lng;
+  const disp = document.getElementById('loc-display');
+  document.getElementById('loc-text').textContent =
+    `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  disp.classList.add('active');
+  if(userMarker) userMarker.setLatLng([lat,lng]);
+  else userMarker = L.marker([lat,lng],{icon:userIcon,draggable:true}).addTo(map)
+    .on('dragend', e=>{
+      const ll=e.target.getLatLng();
+      setLocation(ll.lat,ll.lng);
+    });
+  if(fly) map.flyTo([lat,lng],15,{duration:1.4});
+}
+
+map.on('click', e => setLocation(e.latlng.lat, e.latlng.lng));
+
+document.getElementById('gps-btn').addEventListener('click', ()=>{
+  if(!navigator.geolocation){ toast('GPS not supported','err'); return; }
+  navigator.geolocation.getCurrentPosition(
+    p => setLocation(p.coords.latitude, p.coords.longitude, true),
+    e => toast('GPS error: '+e.message,'err'),
+    {enableHighAccuracy:true}
+  );
+});
+
+// ── Urgency toggle ───────────────────────────────────────────────
+document.querySelectorAll('.urg-opt').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    document.querySelectorAll('.urg-opt').forEach(x=>x.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('f-urgency').value = el.dataset.u;
+  });
+});
+
+// ── Submit ───────────────────────────────────────────────────────
+document.getElementById('submit-btn').addEventListener('click', async ()=>{
+  const name    = document.getElementById('f-name').value.trim();
+  const blood   = document.getElementById('f-blood').value;
+  const urgency = document.getElementById('f-urgency').value;
+  const label   = document.getElementById('f-label').value.trim();
+
+  if(!name){ toast('Enter patient name','err'); return; }
+  if(!userLat){ toast('Pin your location on the map first','err'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.textContent = 'POSTING…'; btn.disabled=true;
+
+  try{
+    const res = await fetch(`${API}/api/request`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        name, blood_type:blood, urgency,
+        lat:userLat, lng:userLng,
+        address_label: label || 'Undisclosed'
+      })
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error||'Server error');
+    showResult(data);
+    toast('Request posted — ID: '+data.req_id,'ok');
+  }catch(e){
+    toast('Error: '+e.message,'err');
+    console.error(e);
+  }finally{
+    btn.textContent='▲ POST BLOOD REQUEST'; btn.disabled=false;
+  }
+});
+
+function showResult(data){
+  document.getElementById('result-card').style.display='block';
+  document.getElementById('r-id').textContent = data.req_id;
+  document.getElementById('r-chat').href = `chat.html?room=${data.room_id}&role=recipient`;
+
+  const bankList = document.getElementById('r-banks');
+  bankList.innerHTML='';
+  (data.nearby_banks||[]).forEach(b=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<span>${b.name}</span>
+      <span class="nearby-dist">${(b.distance_m/1000).toFixed(1)} km</span>`;
+    bankList.appendChild(li);
+  });
+
+  const ambList = document.getElementById('r-ambs');
+  ambList.innerHTML='';
+  (data.nearby_ambs||[]).forEach(a=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<span>${a.name}</span>
+      <span class="nearby-dist">${(a.distance_m/1000).toFixed(1)} km</span>`;
+    ambList.appendChild(li);
+  });
+}
+
+// ── Toast ────────────────────────────────────────────────────────
+function toast(msg, type='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='show '+(type||'');
+  setTimeout(()=>t.className='',3200);
+}
+</script>
 </body>
-
 </html>
