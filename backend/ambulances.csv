@@ -1,0 +1,16 @@
+name,lat,lng,area,phone,type,capacity,cost_per_km,rating
+Mumbai Central Ambulance Hub,18.9723,72.82,Mumbai Central,1916,ambulance,4,40,4.9
+BKC Emergency Response,19.0655,72.861,Bandra Kurla Complex,022-26590000,ambulance,2,16,3.8
+Andheri Mobile Blood Van,19.1195,72.846,Andheri West,022-26283000,mobile_van,8,36,4.2
+Borivali Blood Mobile,19.2291,72.857,Borivali West,022-28936000,mobile_van,10,30,4.9
+Dadar Rapid Response,19.0189,72.844,Dadar,022-24154000,ambulance,2,17,4
+Kurla Emergency Unit,19.0754,72.889,Kurla,022-67556000,ambulance,3,32,3.7
+Malad Blood Van,19.1855,72.861,Malad East,022-28714000,mobile_van,8,50,4.3
+Powai Mobile Unit,19.1179,72.91,Powai,022-25763000,mobile_van,6,26,3.7
+Thane Border Ambulance,19.1678,72.951,Mulund,022-67994000,ambulance,2,50,3.6
+Colaba South Responder,18.9055,72.815,Colaba,022-22143000,ambulance,2,45,3.7
+Ghatkopar Van,19.0825,72.903,Ghatkopar East,022-21025000,mobile_van,8,25,3.2
+Goregaon Mobile,19.1636,72.841,Goregaon West,022-28797000,mobile_van,6,20,4.7
+Bhandup Van,19.1452,72.936,Bhandup West,022-25951000,mobile_van,10,47,4.6
+Sion Rapid Unit,19.0355,72.859,Sion,022-24021000,ambulance,3,24,4.3
+Kandivali Blood Van,19.2055,72.852,Kandivali West,022-28647000,mobile_van,8,45,4.5

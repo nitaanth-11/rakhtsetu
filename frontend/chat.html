@@ -170,6 +170,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--b
 @keyframes spin{to{transform:rotate(360deg)}}
 .pending-text{font-family:var(--mono);font-size:.75rem;color:var(--muted);letter-spacing:2px}
 
+/* nav links */
+.nav-link:hover{border-color:var(--red-d) !important;color:var(--text) !important}
+
 /* toast */
 #toast{
   position:fixed;bottom:24px;right:24px;
@@ -192,9 +195,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--b
 <div id="chat-panel">
 
   <div class="chat-head">
-    <div class="chat-logo">
-      RAKHTSETU
-      <span class="secure-badge">🔒 E2E ENCRYPTED</span>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div class="chat-logo">
+        RAKHTSETU
+        <span class="secure-badge">🔒 E2E ENCRYPTED</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <a href="dashboard.html" class="nav-link" style="font-family:var(--mono);font-size:.6rem;color:var(--muted);text-decoration:none;letter-spacing:1px;border:1px solid var(--border);padding:5px 10px;border-radius:2px;transition:.2s">← DASHBOARD</a>
+        <a href="profile.html" class="nav-link" style="font-family:var(--mono);font-size:.6rem;color:var(--muted);text-decoration:none;letter-spacing:1px;border:1px solid var(--border);padding:5px 10px;border-radius:2px;transition:.2s">👤 PROFILE</a>
+      </div>
     </div>
     <div class="room-info">
       ROOM <span id="h-room">—</span>

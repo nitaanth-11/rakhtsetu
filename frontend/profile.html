@@ -1,156 +1,531 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
-<title>My Profile</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RakhtSetu · My Profile</title>
+<meta name="description" content="Donor profile, donation history, and impact summary on RakhtSetu — Mumbai's live blood donation network.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-
+:root{
+  --red:#c0392b;--red-b:#e74c3c;--red-d:#7b1c1c;
+  --red-glow:rgba(192,57,43,.35);
+  --bg:#080b0e;--panel:#0e1318;--panel2:#141b22;--panel3:#1a232e;
+  --border:#1e2a35;--text:#d4dde8;--muted:#566879;
+  --green:#1b5e20;--green-b:#43a047;
+  --orange:#e65100;--orange-b:#ffa726;
+  --blue:#0d47a1;--blue-b:#42a5f5;
+  --gold:#f9a825;--gold-b:#ffe082;
+  --mono:'Share Tech Mono',monospace;
+  --head:'Rajdhani',sans-serif;
+  --body:'Inter',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
 body{
-font-family:Arial;
-background:#f4f4f4;
-margin:0;
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--body);
+  background-image:
+    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(192,57,43,.12) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 30% at 100% 100%, rgba(13,71,161,.08) 0%, transparent 60%);
 }
 
-/* Header */
+/* ── TOP BAR ── */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;gap:14px;
+  padding:14px 28px;
+  background:rgba(8,11,14,.92);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(10px);
+}
+.logo{
+  font-family:var(--head);font-size:1.3rem;font-weight:700;
+  color:var(--red-b);letter-spacing:3px;text-decoration:none;
+}
+.live-dot{
+  width:7px;height:7px;background:var(--red-b);border-radius:50%;
+  box-shadow:0 0 0 0 var(--red-glow);
+  animation:pulse 1.5s infinite;flex-shrink:0;
+}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 var(--red-glow)}
+  70%{box-shadow:0 0 0 8px rgba(0,0,0,0)}
+  100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}
+}
+.topbar-right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.nav-link{
+  font-family:var(--mono);font-size:.65rem;color:var(--muted);
+  text-decoration:none;letter-spacing:1px;
+  border:1px solid var(--border);padding:6px 12px;border-radius:2px;
+  transition:.2s;background:transparent;cursor:pointer;
+}
+.nav-link:hover{border-color:var(--red-d);color:var(--text)}
+.nav-link.active{border-color:var(--red);color:var(--red-b)}
 
-.header{
-background:#b30000;
-color:white;
-padding:15px;
-text-align:center;
-font-size:24px;
+/* ── PAGE LAYOUT ── */
+.page{
+  max-width:780px;margin:0 auto;
+  padding:40px 24px 80px;
 }
 
-/* Profile Container */
-
-.container{
-width:420px;
-margin:auto;
-margin-top:40px;
-background:white;
-padding:25px;
-border-radius:12px;
-box-shadow:0 0 12px rgba(0,0,0,0.2);
+/* ── HERO CARD ── */
+.hero-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:32px 32px 28px;
+  display:flex;align-items:center;gap:28px;
+  position:relative;overflow:hidden;
+  margin-bottom:24px;
+  background-image:linear-gradient(135deg, var(--panel) 60%, rgba(192,57,43,.06));
+}
+.hero-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg, transparent, var(--red-b), var(--red-d), transparent);
 }
 
-/* Profile Info */
+/* Avatar */
+.avatar-wrap{
+  position:relative;flex-shrink:0;
+}
+.avatar{
+  width:96px;height:96px;border-radius:50%;
+  background:linear-gradient(135deg,var(--red-d),#180808);
+  border:2px solid var(--red-d);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  box-shadow:0 0 0 4px rgba(192,57,43,.15), 0 0 24px rgba(192,57,43,.15);
+}
+.avatar svg{width:68px;height:68px}
+.avatar-ring{
+  position:absolute;inset:-6px;border-radius:50%;
+  border:1px solid rgba(192,57,43,.3);
+  animation:spin 12s linear infinite;
+  border-top-color:var(--red-b);
+}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-.info{
-margin-bottom:15px;
-font-size:18px;
+.donor-badge{
+  position:absolute;bottom:-4px;right:-4px;
+  background:var(--red);border:2px solid var(--bg);
+  border-radius:50%;width:26px;height:26px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;
 }
 
-/* Donation Section */
-
-.history{
-margin-top:25px;
+/* Info */
+.hero-info{flex:1}
+.hero-name{
+  font-family:var(--head);font-size:1.8rem;font-weight:700;
+  letter-spacing:2px;margin-bottom:4px;
+}
+.hero-sub{
+  font-family:var(--mono);font-size:.68rem;color:var(--muted);
+  letter-spacing:1.5px;margin-bottom:16px;
+}
+.info-grid{display:flex;flex-wrap:wrap;gap:10px}
+.info-pill{
+  font-family:var(--mono);font-size:.68rem;
+  padding:5px 12px;border-radius:2px;
+  background:var(--panel2);border:1px solid var(--border);
+  color:var(--muted);
+}
+.info-pill span{color:var(--text);font-weight:500;margin-left:4px}
+.blood-hero{
+  font-family:var(--head);font-size:2rem;font-weight:700;
+  color:var(--red-b);text-align:center;width:62px;
+  background:rgba(192,57,43,.12);border:1px solid var(--red-d);
+  border-radius:4px;padding:8px 4px;flex-shrink:0;
+  text-shadow:0 0 12px var(--red-glow);
 }
 
-.card{
-
-background:#f4f4f4;
-padding:12px;
-margin:10px 0;
-border-radius:8px;
-
+/* ── THANK YOU BANNER ── */
+.thankyou-banner{
+  background:linear-gradient(135deg, rgba(192,57,43,.08), rgba(249,168,37,.06));
+  border:1px solid rgba(249,168,37,.2);
+  border-radius:8px;padding:24px 28px;
+  margin-bottom:24px;position:relative;overflow:hidden;
+  text-align:center;
+}
+.thankyou-banner::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.thankyou-icon{font-size:2rem;margin-bottom:10px}
+.thankyou-title{
+  font-family:var(--head);font-size:1.4rem;font-weight:700;
+  color:var(--gold-b);letter-spacing:2px;margin-bottom:8px;
+}
+.thankyou-msg{
+  font-size:.88rem;color:var(--muted);line-height:1.8;max-width:500px;margin:0 auto;
+}
+.thankyou-msg strong{color:var(--text)}
+.hearts{
+  display:flex;justify-content:center;gap:6px;margin-top:14px;
+  font-size:.85rem;opacity:.7;
 }
 
-/* Button */
-
-button{
-
-margin-top:20px;
-padding:10px 18px;
-background:#b30000;
-color:white;
-border:none;
-border-radius:6px;
-cursor:pointer;
-
+/* ── SECTION HEADER ── */
+.section-label{
+  font-family:var(--mono);font-size:.65rem;color:var(--muted);
+  letter-spacing:2px;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-label::after{
+  content:'';flex:1;height:1px;background:var(--border);
 }
 
+/* ── STATS ROW ── */
+.stats-row{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+  margin-bottom:24px;
+}
+.stat-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:6px;padding:18px 16px;text-align:center;
+  transition:border-color .2s;
+}
+.stat-card:hover{border-color:var(--red-d)}
+.stat-num{
+  font-family:var(--head);font-size:2rem;font-weight:700;
+  color:var(--red-b);margin-bottom:4px;
+  text-shadow:0 0 10px var(--red-glow);
+}
+.stat-num.gold{color:var(--gold);text-shadow:none}
+.stat-num.blue{color:var(--blue-b);text-shadow:none}
+.stat-unit{font-family:var(--mono);font-size:.6rem;color:var(--muted);letter-spacing:1px}
+
+/* ── DONATION HISTORY ── */
+.hist-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:8px;margin-bottom:24px;overflow:hidden;
+}
+.hist-card-head{
+  padding:18px 22px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.hist-card-title{
+  font-family:var(--head);font-size:1rem;font-weight:700;
+  letter-spacing:2px;color:var(--text);
+}
+
+.donation-item{
+  padding:16px 22px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:16px;
+  transition:background .15s;
+  animation:slideIn .35s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.donation-item:last-child{border-bottom:none}
+.donation-item:hover{background:var(--panel2)}
+
+.don-icon{
+  width:40px;height:40px;border-radius:4px;flex-shrink:0;
+  background:rgba(192,57,43,.12);border:1px solid var(--red-d);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;
+}
+.don-meta{flex:1}
+.don-hospital{font-weight:500;font-size:.9rem;margin-bottom:3px}
+.don-date{font-family:var(--mono);font-size:.63rem;color:var(--muted)}
+.don-type{font-family:var(--mono);font-size:.6rem;color:var(--muted);margin-top:2px}
+.don-badge{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:1px;
+  padding:3px 9px;border-radius:2px;
+}
+.don-badge.ok{background:rgba(27,94,32,.3);border:1px solid var(--green);color:var(--green-b)}
+.don-badge.pending{background:rgba(230,81,0,.2);border:1px solid var(--orange);color:var(--orange-b)}
+
+.don-unit{
+  font-family:var(--head);font-size:1.1rem;font-weight:700;
+  color:var(--red-b);text-align:right;
+  min-width:36px;
+}
+
+.hist-empty{
+  padding:40px;text-align:center;
+  font-family:var(--mono);font-size:.75rem;color:var(--muted);line-height:2;
+}
+
+/* ── IMPACT METER ── */
+.impact-wrap{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:8px;padding:22px 24px;margin-bottom:24px;
+}
+.impact-label{
+  display:flex;justify-content:space-between;
+  font-family:var(--mono);font-size:.65rem;color:var(--muted);
+  margin-bottom:10px;
+}
+.impact-label span{color:var(--red-b)}
+.impact-bar{
+  background:var(--panel2);border-radius:2px;height:6px;overflow:hidden;
+  border:1px solid var(--border);
+}
+.impact-fill{
+  height:100%;border-radius:2px;
+  background:linear-gradient(90deg,var(--red-d),var(--red-b));
+  transition:width 1.2s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 8px var(--red-glow) ;
+  width:0%;
+}
+.impact-note{
+  font-family:var(--mono);font-size:.62rem;color:var(--muted);
+  margin-top:8px;text-align:right;
+}
+
+/* ── EDIT BUTTON ── */
+.edit-btn{
+  font-family:var(--mono);font-size:.65rem;letter-spacing:1.5px;
+  padding:7px 16px;background:transparent;
+  border:1px solid var(--border);color:var(--muted);
+  border-radius:2px;cursor:pointer;transition:.2s;
+}
+.edit-btn:hover{border-color:var(--red-d);color:var(--text)}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--red-d);border-radius:2px}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(14px);
+  background:var(--panel2);border:1px solid var(--border);padding:12px 22px;
+  border-radius:3px;font-family:var(--mono);font-size:.75rem;
+  opacity:0;transition:.35s;z-index:9999;pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.ok{border-color:#2e7d32;color:var(--green-b)}
+
+@media(max-width:600px){
+  .hero-card{flex-wrap:wrap;padding:24px 20px}
+  .stats-row{grid-template-columns:repeat(3,1fr);gap:8px}
+  .page{padding:24px 14px 60px}
+  .hero-name{font-size:1.4rem}
+}
 </style>
-
 </head>
-
 <body>
 
-<div class="header">
-My Profile
-</div>
+<!-- ── TOP BAR ── -->
+<header class="topbar">
+  <div class="live-dot"></div>
+  <a href="dashboard.html" class="logo">RAKHTSETU</a>
+  <div style="font-family:var(--mono);font-size:.6rem;color:var(--muted);letter-spacing:1.5px">DONOR PROFILE</div>
+  <nav class="topbar-right">
+    <a href="dashboard.html" class="nav-link">← LIVE FEED</a>
+    <a href="index.html" class="nav-link">+ REQUEST</a>
+    <a href="profile.html" class="nav-link active">👤 PROFILE</a>
+  </nav>
+</header>
 
-<div class="container">
+<!-- ── PAGE ── -->
+<main class="page">
 
-<h2 id="name"></h2>
+  <!-- HERO -->
+  <div class="hero-card">
+    <div class="avatar-wrap">
+      <div class="avatar">
+        <!-- Person SVG -->
+        <svg viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="34" cy="24" r="13" fill="rgba(192,57,43,.35)" stroke="#c0392b" stroke-width="1.5"/>
+          <path d="M8 62c0-14.36 11.64-26 26-26s26 11.64 26 26" stroke="#c0392b" stroke-width="1.8" stroke-linecap="round" fill="rgba(192,57,43,.15)"/>
+          <!-- blood drop -->
+          <path d="M34 12 c0 0-5 7-5 10a5 5 0 0 0 10 0c0-3-5-10-5-10z" fill="#e74c3c" opacity=".7"/>
+        </svg>
+      </div>
+      <div class="avatar-ring"></div>
+      <div class="donor-badge">🩸</div>
+    </div>
 
-<div class="info">
-<b>Blood Type:</b> <span id="blood"></span>
-</div>
+    <div class="hero-info">
+      <div class="hero-name" id="hero-name">—</div>
+      <div class="hero-sub" id="hero-sub">BLOOD DONOR · RAKHTSETU</div>
+      <div class="info-grid">
+        <div class="info-pill">PHONE <span id="p-phone">—</span></div>
+        <div class="info-pill">LAT <span id="p-lat">—</span></div>
+        <div class="info-pill">LNG <span id="p-lng">—</span></div>
+        <div class="info-pill">STATUS <span style="color:var(--green-b)">ACTIVE</span></div>
+      </div>
+    </div>
 
-<div class="info">
-<b>Phone:</b> <span id="phone"></span>
-</div>
+    <div class="blood-hero" id="p-blood">—</div>
+  </div>
 
-<div class="info">
-<b>Latitude:</b> <span id="lat"></span>
-</div>
+  <!-- THANK YOU -->
+  <div class="thankyou-banner">
+    <div class="thankyou-icon">🏅</div>
+    <div class="thankyou-title">THANK YOU, HERO.</div>
+    <div class="thankyou-msg" id="thankyou-msg">
+      Every drop you donate writes a story of hope.<br>
+      <strong>Your generosity has the power to save up to 3 lives per donation.</strong><br>
+      Mumbai's blood network stands stronger because of people like you.
+      RakhtSetu is grateful — and so are the families you've touched.
+    </div>
+    <div class="hearts">🩸 &nbsp; ❤️ &nbsp; 🩸 &nbsp; ❤️ &nbsp; 🩸</div>
+  </div>
 
-<div class="info">
-<b>Longitude:</b> <span id="lon"></span>
-</div>
+  <!-- STATS -->
+  <p class="section-label">IMPACT SUMMARY</p>
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num" id="stat-donations">0</div>
+      <div class="stat-unit">DONATIONS</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num gold" id="stat-lives">0</div>
+      <div class="stat-unit">LIVES IMPACTED</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num blue" id="stat-units">0</div>
+      <div class="stat-unit">UNITS GIVEN (ml)</div>
+    </div>
+  </div>
 
-<div class="history">
+  <!-- IMPACT BAR -->
+  <div class="impact-wrap">
+    <div class="impact-label">
+      <span>DONOR LEVEL</span>
+      <span id="impact-level">HERO DONOR</span>
+    </div>
+    <div class="impact-bar"><div class="impact-fill" id="impact-fill"></div></div>
+    <div class="impact-note" id="impact-note">Next level: Lifesaver Elite</div>
+  </div>
 
-<h3>Donation History</h3>
+  <!-- DONATION HISTORY -->
+  <p class="section-label">DONATION HISTORY</p>
+  <div class="hist-card">
+    <div class="hist-card-head">
+      <div class="hist-card-title">ALL DONATIONS</div>
+      <span style="font-family:var(--mono);font-size:.65rem;color:var(--muted)" id="hist-count">0 records</span>
+    </div>
+    <div id="hist-list">
+      <div class="hist-empty">No donations recorded yet.<br><span style="font-size:.65rem">Donate blood to see your history here.</span></div>
+    </div>
+  </div>
 
-<div id="historyList">
+  <!-- BACK BUTTON -->
+  <div style="text-align:center;margin-top:8px">
+    <a href="dashboard.html" class="nav-link" style="padding:12px 32px;font-size:.7rem;letter-spacing:2px">
+      ← BACK TO LIVE FEED
+    </a>
+  </div>
 
-<div class="card">
-Hospital: City Hospital  
-Date: 2024-10-12
-</div>
+</main>
 
-<div class="card">
-Hospital: Metro Blood Bank  
-Date: 2024-07-02
-</div>
-
-</div>
-
-</div>
-
-<button onclick="goBack()">Back to Dashboard</button>
-
-</div>
+<div id="toast"></div>
 
 <script>
+// ── Load donor from localStorage ──────────────────────────────────
+const donor = JSON.parse(localStorage.getItem('donor') || 'null');
 
-/* Load donor info */
+// Demo history (merge with localStorage if exists)
+const history = JSON.parse(localStorage.getItem('donationHistory') || '[]');
 
-const donor = JSON.parse(localStorage.getItem("donor"))
-
+// ── Populate hero ─────────────────────────────────────────────────
 if(donor){
+  document.getElementById('hero-name').textContent    = donor.name || 'Donor';
+  document.getElementById('p-blood').textContent      = donor.blood_type || '—';
+  document.getElementById('p-phone').textContent      = donor.phone || '—';
+  document.getElementById('p-lat').textContent        = donor.latitude ? parseFloat(donor.latitude).toFixed(4) : '—';
+  document.getElementById('p-lng').textContent        = donor.longitude ? parseFloat(donor.longitude).toFixed(4) : '—';
+  document.getElementById('hero-sub').textContent     = `${donor.blood_type || ''} BLOOD DONOR · RAKHTSETU`;
 
-document.getElementById("name").innerText = donor.name
-document.getElementById("blood").innerText = donor.blood_type
-document.getElementById("phone").innerText = donor.phone
-document.getElementById("lat").innerText = donor.latitude
-document.getElementById("lon").innerText = donor.longitude
-
+  // Personalise thank-you
+  const firstName = (donor.name || 'Donor').split(' ')[0];
+  document.getElementById('thankyou-msg').innerHTML =
+    `Every drop you donate, <strong>${firstName}</strong>, writes a story of hope.<br>
+     <strong>Your generosity has the power to save up to 3 lives per donation.</strong><br>
+     Mumbai's blood network stands stronger because of heroes like you.
+     RakhtSetu is grateful — and so are the families you've touched. 🙏`;
+} else {
+  document.getElementById('hero-name').textContent = 'Not Registered';
+  document.getElementById('p-blood').textContent   = '—';
+  document.getElementById('thankyou-msg').innerHTML =
+    `<a href="register.html" style="color:var(--red-b);text-decoration:underline">Register as a donor</a> to start saving lives and track your donation history.`;
 }
 
-/* Back button */
+// ── Render donation history ─────────────────────────────────────
+const listEl     = document.getElementById('hist-list');
+const histCountEl = document.getElementById('hist-count');
+const totalDonations = history.length;
+const okDonations    = history.filter(h => h.status === 'ok').length;
+const totalUnits     = history.reduce((s, h) => s + (h.units || 0), 0);
 
-function goBack(){
+histCountEl.textContent = `${totalDonations} record${totalDonations !== 1 ? 's' : ''}`;
 
-window.location.href = "dashboard.html"
-
+if(totalDonations > 0){
+  listEl.innerHTML = '';
+  history.forEach((h, i) => {
+    const d = document.createElement('div');
+    d.className = 'donation-item';
+    d.style.animationDelay = `${i * 60}ms`;
+    // Use real fields from donation records
+    const label = h.location || h.hospital || h.recipient || 'Donation';
+    const donType = h.type || 'Whole Blood';
+    d.innerHTML = `
+      <div class="don-icon">🏥</div>
+      <div class="don-meta">
+        <div class="don-hospital">${label}</div>
+        <div class="don-date">${formatDate(h.date)}</div>
+        <div class="don-type">${donType}${h.recipient ? ' · For: '+h.recipient : ''}</div>
+      </div>
+      <span class="don-badge ${h.status}">${h.status === 'ok' ? '✓ VERIFIED' : '⏳ PENDING'}</span>
+      <div class="don-unit">${h.units || 450}<br><span style="font-family:var(--mono);font-size:.5rem;color:var(--muted)">ml</span></div>`;
+    listEl.appendChild(d);
+  });
 }
 
+// ── Stats ─────────────────────────────────────────────────────────
+animateCount('stat-donations', totalDonations);
+animateCount('stat-lives',     okDonations * 3);
+animateCount('stat-units',     totalUnits);
+
+// ── Impact level bar ──────────────────────────────────────────────
+const levels = [
+  { label:'FIRST DROP',      next:'Regular Donor',    min:0,  max:1,  pct:20 },
+  { label:'REGULAR DONOR',   next:'Dedicated Donor',  min:2,  max:4,  pct:40 },
+  { label:'DEDICATED DONOR', next:'Hero Donor',       min:5,  max:9,  pct:60 },
+  { label:'HERO DONOR',      next:'Lifesaver Elite',  min:10, max:19, pct:80 },
+  { label:'LIFESAVER ELITE', next:'Legend',           min:20, max:99, pct:100},
+];
+const lvl = levels.find(l => totalDonations >= l.min && totalDonations <= l.max) || levels[0];
+const pct = lvl.pct - 20 + Math.min(20, (totalDonations - lvl.min) / Math.max(1, lvl.max - lvl.min) * 20);
+
+document.getElementById('impact-level').textContent = lvl.label;
+document.getElementById('impact-note').textContent  = `Next level: ${lvl.next} · ${Math.max(0, lvl.max + 1 - totalDonations)} donation${(lvl.max + 1 - totalDonations) !== 1 ? 's' : ''} away`;
+
+setTimeout(() => {
+  document.getElementById('impact-fill').style.width = `${Math.min(100, pct)}%`;
+}, 300);
+
+// ── Helpers ───────────────────────────────────────────────────────
+function formatDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-IN',{ day:'numeric', month:'short', year:'numeric' });
+}
+
+function animateCount(id, target){
+  const el = document.getElementById(id);
+  if(!target){ el.textContent = 0; return; }
+  let start = 0;
+  const step = Math.ceil(target / 40);
+  const t = setInterval(() => {
+    start = Math.min(start + step, target);
+    el.textContent = start;
+    if(start >= target) clearInterval(t);
+  }, 30);
+}
+
+function toast(msg, type='ok'){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show ' + type;
+  setTimeout(() => t.className = '', 3200);
+}
 </script>
-
 </body>
-
 </html>

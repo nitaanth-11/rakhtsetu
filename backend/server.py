@@ -9,7 +9,9 @@ GET  /api/banks              → all blood banks + ambulances from CSV
 GET  /api/feed               → live request feed (SSE)
 POST /api/request            → post a blood request (location encrypted)
 GET  /api/request/<id>       → get single request metadata (no raw coords)
-POST /api/connect            → donor connects; decrypts location, returns A* route
+POST /api/register           → register a new donor
+GET  /api/donor/<id>/donations → get donor's donation history
+POST /api/connect            → donor connects; decrypts location, returns A* route + records donation (100-day cooldown)
 GET  /api/route/<req_id>     → fetch cached A* route for a connected pair
 POST /api/chat/<room>        → post a chat message
 GET  /api/chat/<room>        → get chat history
@@ -42,9 +44,17 @@ from data_loader import (
     nearest_ambulances,
     nearest_blood_banks,
 )
+import pathlib
 
-app = Flask(__name__)
+_FRONTEND_DIR = str(pathlib.Path(__file__).resolve().parent.parent / "frontend")
+
+app = Flask(__name__, static_folder=_FRONTEND_DIR, static_url_path="")
 CORS(app)
+
+
+@app.route("/")
+def serve_index():
+    return app.send_static_file("register.html")
 
 # ─────────────────────────────────────────────────────────────────
 #  Encryption — one symmetric key per server process.
@@ -69,10 +79,14 @@ def decrypt_coords(token: str) -> dict:
 #  In-memory stores  (replace with Redis / DB in production)
 # ─────────────────────────────────────────────────────────────────
 
-_requests: dict[str, dict] = {}       # req_id → request record
-_routes:   dict[str, dict] = {}       # req_id → A* result (post-connect)
-_chats:    dict[str, list] = {}       # room_id → [msg, ...]
+_requests:  dict[str, dict] = {}       # req_id → request record
+_routes:    dict[str, dict] = {}       # req_id → A* result (post-connect)
+_chats:     dict[str, list] = {}       # room_id → [msg, ...]
+_donors:    dict[str, dict] = {}       # donor_id → donor profile
+_donations: list[dict]      = []       # list of donation records
 _chat_lock = Lock()
+
+MIN_DONATION_GAP_DAYS = 100            # minimum days between two donations
 
 # SSE subscriber queues
 _feed_subscribers:  list[queue.Queue] = []
@@ -138,8 +152,11 @@ def api_banks():
 @app.route("/api/ambulances")
 def api_ambulances():
     """
-    Return nearest ambulances enriched with distance, cost_per_km, rating, total_cost.
-    Query params: lat (float), lng (float), n (int, default 5)
+    Return nearest ambulances enriched with distance, cost_per_km, rating, total_cost, eta.
+    Query params:
+        lat, lng (float) — pickup location (required)
+        drop_lat, drop_lng (float) — dropoff location (optional, for trip cost)
+        n (int, default 5)
     """
     try:
         lat = float(request.args["lat"])
@@ -149,7 +166,83 @@ def api_ambulances():
 
     n = int(request.args.get("n", 5))
     units = nearest_ambulances(lat, lng, n=n)
+
+    # Optional dropoff — compute trip distance & cost
+    drop_lat = request.args.get("drop_lat")
+    drop_lng = request.args.get("drop_lng")
+    has_dropoff = drop_lat and drop_lng
+
+    AVG_SPEED_KMH = 25  # avg ambulance speed in Mumbai traffic
+
+    for u in units:
+        # ETA from ambulance base → pickup (minutes)
+        eta_min = round((u["distance_km"] / AVG_SPEED_KMH) * 60)
+        u["eta_min"] = max(eta_min, 2)  # minimum 2 min
+
+        if has_dropoff:
+            from data_loader import haversine
+            trip_m = haversine(lat, lng, float(drop_lat), float(drop_lng))
+            trip_km = round(trip_m / 1000, 2)
+            u["trip_km"] = trip_km
+            u["total_cost"] = round(u["cost_per_km"] * trip_km, 2)
+            # ETA for full trip: ambulance→pickup + pickup→dropoff
+            trip_eta = round((trip_km / AVG_SPEED_KMH) * 60)
+            u["trip_eta_min"] = max(trip_eta, 3)
+
     return jsonify({"ambulances": units})
+
+
+# ─────────────────────────────────────────────────────────────────
+#  Donor registration
+# ─────────────────────────────────────────────────────────────────
+
+@app.route("/api/register", methods=["POST"])
+def register_donor():
+    """
+    Body (JSON):
+        name, age, blood_type, phone, password, latitude, longitude
+    Returns: donor_id + profile.
+    """
+    body = request.get_json(force=True)
+
+    required = {"name", "blood_type", "phone", "password"}
+    if not required.issubset(body):
+        return jsonify({"error": "Missing required fields: name, blood_type, phone, password"}), 400
+
+    # Check if phone already registered
+    for d in _donors.values():
+        if d["phone"] == body["phone"]:
+            return jsonify({"error": "Phone number already registered", "donor_id": d["id"]}), 409
+
+    donor_id = str(uuid.uuid4())[:8].upper()
+    donor = {
+        "id":         donor_id,
+        "name":       body["name"],
+        "age":        int(body.get("age", 0)),
+        "blood_type": body["blood_type"],
+        "phone":      body["phone"],
+        "password":   body["password"],   # In production: hash this!
+        "latitude":   float(body.get("latitude", 0)),
+        "longitude":  float(body.get("longitude", 0)),
+        "available":  True,
+        "registered_at": datetime.utcnow().isoformat() + "Z",
+    }
+    _donors[donor_id] = donor
+
+    # Return without password
+    safe = {k: v for k, v in donor.items() if k != "password"}
+    return jsonify({"donor_id": donor_id, "donor": safe, "message": "Registration successful"}), 201
+
+
+@app.route("/api/donor/<donor_id>/donations")
+def get_donor_donations(donor_id):
+    """Return donation history for a specific donor."""
+    donor_id = donor_id.upper()
+    if donor_id not in _donors:
+        return jsonify({"error": "Donor not found"}), 404
+    history = [d for d in _donations if d["donor_id"] == donor_id]
+    history.sort(key=lambda x: x["date"], reverse=True)
+    return jsonify({"donations": history, "count": len(history)})
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -278,8 +371,9 @@ def stream_feed():
 @app.route("/api/connect", methods=["POST"])
 def connect_donor():
     """
-    Body: { req_id, donor_name, donor_lat, donor_lng, donor_blood_type }
+    Body: { req_id, donor_name, donor_lat, donor_lng, donor_blood_type, donor_id (optional) }
     Returns: decrypted recipient coords + A* route (donor → recipient).
+    Also records a donation if donor_id is provided, with 100-day cooldown check.
     """
     body = request.get_json(force=True)
     req_id = body.get("req_id", "").upper()
@@ -289,6 +383,23 @@ def connect_donor():
         return jsonify({"error": "Request not found"}), 404
     if rec["status"] != "open":
         return jsonify({"error": "Request already fulfilled or connected"}), 409
+
+    # ── 100-day cooldown check ──
+    donor_id = body.get("donor_id", "").upper() if body.get("donor_id") else ""
+    if donor_id:
+        donor_history = [d for d in _donations if d["donor_id"] == donor_id]
+        if donor_history:
+            donor_history.sort(key=lambda x: x["date"], reverse=True)
+            last = datetime.fromisoformat(donor_history[0]["date"].replace("Z", "+00:00"))
+            now = datetime.utcnow().replace(tzinfo=last.tzinfo)
+            days_since = (now - last).days
+            if days_since < MIN_DONATION_GAP_DAYS:
+                days_left = MIN_DONATION_GAP_DAYS - days_since
+                return jsonify({
+                    "error": f"You must wait at least {MIN_DONATION_GAP_DAYS} days between donations. "
+                             f"You can donate again in {days_left} day(s).",
+                    "days_remaining": days_left,
+                }), 429
 
     donor_lat = float(body["donor_lat"])
     donor_lng = float(body["donor_lng"])
@@ -316,6 +427,22 @@ def connect_donor():
     # Update request status
     _requests[req_id]["status"] = "connected"
 
+    # ── Record donation naturally ──
+    donation_record = {
+        "id":          str(uuid.uuid4())[:8].upper(),
+        "donor_id":    donor_id,
+        "donor_name":  body.get("donor_name", "Donor"),
+        "req_id":      req_id,
+        "recipient":   rec["name"],
+        "blood_type":  rec["blood_type"],
+        "location":    rec.get("address_label", "Undisclosed"),
+        "date":        datetime.utcnow().isoformat() + "Z",
+        "status":      "ok",
+        "units":       450,
+        "type":        "Whole Blood",
+    }
+    _donations.append(donation_record)
+
     # Notify feed
     _push_feed_event({
         "event": "request_connected",
@@ -334,6 +461,7 @@ def connect_donor():
         "recipient_coords": {"lat": r_lat, "lng": r_lng},
         "route":            route,
         "room_id":          req_id,
+        "donation":         donation_record,
     })
 
 

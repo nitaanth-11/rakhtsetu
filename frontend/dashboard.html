@@ -1,589 +1,1180 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RakhtSetu · Live Feed</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<style>
-:root{
-  --red:#c0392b;--red-b:#e74c3c;--red-d:#7b1c1c;
-  --red-glow:rgba(192,57,43,.35);
-  --bg:#080b0e;--panel:#0e1318;--panel2:#141b22;--panel3:#1a232e;
-  --border:#1e2a35;--text:#d4dde8;--muted:#566879;
-  --green:#1b5e20;--green-b:#43a047;
-  --orange:#e65100;--orange-b:#ffa726;
-  --blue:#0d47a1;--blue-b:#42a5f5;
-  --mono:'Share Tech Mono',monospace;
-  --head:'Rajdhani',sans-serif;
-  --body:'Inter',sans-serif;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--body);overflow:hidden}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RakhtSetu · Live Feed</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    :root {
+      --red: #c0392b;
+      --red-b: #e74c3c;
+      --red-d: #7b1c1c;
+      --red-glow: rgba(192, 57, 43, .35);
+      --bg: #080b0e;
+      --panel: #0e1318;
+      --panel2: #141b22;
+      --panel3: #1a232e;
+      --border: #1e2a35;
+      --text: #d4dde8;
+      --muted: #566879;
+      --green: #1b5e20;
+      --green-b: #43a047;
+      --orange: #e65100;
+      --orange-b: #ffa726;
+      --blue: #0d47a1;
+      --blue-b: #42a5f5;
+      --mono: 'Share Tech Mono', monospace;
+      --head: 'Rajdhani', sans-serif;
+      --body: 'Inter', sans-serif;
+    }
 
-.shell{display:flex;height:100vh}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
 
-/* ── LEFT PANEL ── */
-#left{
-  width:440px;min-width:440px;display:flex;flex-direction:column;
-  background:var(--panel);border-right:1px solid var(--border);
-}
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      overflow: hidden
+    }
 
-.topbar{
-  padding:16px 20px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:12px;
-  background:linear-gradient(135deg,#0c1219,#101820);
-  flex-shrink:0;
-}
-.logo{
-  font-family:var(--head);font-size:1.4rem;font-weight:700;
-  color:var(--red-b);letter-spacing:3px;
-}
-.live-dot{
-  width:8px;height:8px;background:var(--red-b);border-radius:50%;
-  box-shadow:0 0 0 0 var(--red-glow);
-  animation:pulse 1.5s infinite;flex-shrink:0;
-}
-@keyframes pulse{
-  0%{box-shadow:0 0 0 0 var(--red-glow)}
-  70%{box-shadow:0 0 0 8px rgba(0,0,0,0)}
-  100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}
-}
-.topbar-right{margin-left:auto;display:flex;gap:8px;align-items:center}
-.count-badge{
-  font-family:var(--mono);font-size:.7rem;color:var(--muted);
-  background:var(--panel2);border:1px solid var(--border);
-  padding:4px 10px;border-radius:2px;
-}
-.nav-link{
-  font-family:var(--mono);font-size:.65rem;color:var(--muted);
-  text-decoration:none;letter-spacing:1px;
-  border:1px solid var(--border);padding:5px 10px;border-radius:2px;
-  transition:.2s;
-}
-.nav-link:hover{border-color:var(--red-d);color:var(--text)}
+    .shell {
+      display: flex;
+      height: 100vh
+    }
 
-/* filter bar */
-.filter-bar{
-  padding:12px 20px;border-bottom:1px solid var(--border);
-  display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;
-}
-.filter-btn{
-  font-family:var(--mono);font-size:.65rem;letter-spacing:1.5px;
-  padding:5px 12px;border:1px solid var(--border);background:transparent;
-  color:var(--muted);border-radius:2px;cursor:pointer;transition:.15s;
-}
-.filter-btn:hover{border-color:var(--muted);color:var(--text)}
-.filter-btn.active{background:var(--red-d);border-color:var(--red);color:#fff}
+    /* ── LEFT PANEL ── */
+    #left {
+      width: 440px;
+      min-width: 440px;
+      display: flex;
+      flex-direction: column;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+    }
 
-/* feed */
-#feed{flex:1;overflow-y:auto;padding:12px}
-#feed::-webkit-scrollbar{width:3px}
-#feed::-webkit-scrollbar-thumb{background:var(--red-d);border-radius:2px}
+    .topbar {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, #0c1219, #101820);
+      flex-shrink: 0;
+    }
 
-.feed-empty{
-  text-align:center;padding:60px 20px;
-  font-family:var(--mono);color:var(--muted);font-size:.8rem;line-height:2;
-}
+    .logo {
+      font-family: var(--head);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--red-b);
+      letter-spacing: 3px;
+    }
 
-/* ── REQUEST CARD ── */
-.req-card{
-  background:var(--panel2);border:1px solid var(--border);
-  border-radius:4px;margin-bottom:10px;overflow:hidden;
-  cursor:pointer;transition:border-color .2s,transform .15s;
-  animation:slideIn .35s ease;
-}
-@keyframes slideIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
-.req-card:hover{border-color:var(--red-d);transform:translateX(2px)}
-.req-card.new-flash{animation:newFlash .8s ease,slideIn .35s ease}
-@keyframes newFlash{
-  0%,100%{box-shadow:none}
-  30%{box-shadow:0 0 0 3px var(--red-glow),inset 0 0 20px rgba(192,57,43,.15)}
-}
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--red-b);
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 var(--red-glow);
+      animation: pulse 1.5s infinite;
+      flex-shrink: 0;
+    }
 
-.card-head{
-  padding:12px 14px 10px;
-  display:flex;align-items:flex-start;gap:12px;
-  border-bottom:1px solid var(--border);
-}
-.blood-badge{
-  font-family:var(--head);font-size:1.4rem;font-weight:700;
-  color:var(--red-b);background:rgba(192,57,43,.12);
-  width:52px;height:52px;border-radius:3px;display:flex;
-  align-items:center;justify-content:center;flex-shrink:0;
-  border:1px solid var(--red-d);
-}
-.card-meta{flex:1}
-.card-name{font-weight:500;font-size:.92rem;margin-bottom:3px}
-.card-loc{font-family:var(--mono);font-size:.68rem;color:var(--muted)}
-.card-time{font-family:var(--mono);font-size:.63rem;color:var(--muted);margin-top:2px}
-.urg-pill{
-  font-family:var(--mono);font-size:.6rem;letter-spacing:1.5px;
-  padding:3px 8px;border-radius:2px;align-self:flex-start;
-}
-.urg-pill.Normal{background:rgba(27,94,32,.3);border:1px solid var(--green);color:var(--green-b)}
-.urg-pill.Urgent{background:rgba(230,81,0,.2);border:1px solid var(--orange);color:var(--orange-b)}
-.urg-pill.Critical{background:rgba(192,57,43,.2);border:1px solid var(--red);color:var(--red-b);animation:urgBlink 1.2s step-end infinite}
-@keyframes urgBlink{50%{opacity:.4}}
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 var(--red-glow)
+      }
 
-.card-body{padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
-.compat-tags{display:flex;gap:5px;flex-wrap:wrap}
-.compat-tag{
-  font-family:var(--mono);font-size:.6rem;padding:2px 7px;
-  background:rgba(192,57,43,.08);border:1px solid var(--border);
-  border-radius:2px;color:var(--muted);
-}
-.donate-btn{
-  font-family:var(--mono);font-size:.65rem;letter-spacing:1.5px;
-  padding:7px 16px;background:var(--red);border:none;color:#fff;
-  border-radius:3px;cursor:pointer;transition:.2s;
-}
-.donate-btn:hover{background:var(--red-b)}
+      70% {
+        box-shadow: 0 0 0 8px rgba(0, 0, 0, 0)
+      }
 
-.ambu-btn{
-  font-family:var(--mono);font-size:.65rem;letter-spacing:1.5px;
-  padding:7px 16px;background:var(--blue);border:none;color:#fff;
-  border-radius:3px;cursor:pointer;transition:.2s;
-}
-.ambu-btn:hover{background:var(--blue-b)}
+      100% {
+        box-shadow: 0 0 0 0 rgba(0, 0, 0, 0)
+      }
+    }
 
-.status-connected{
-  font-family:var(--mono);font-size:.65rem;color:var(--green-b);
-  letter-spacing:1px;
-}
+    .topbar-right {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+      align-items: center
+    }
 
-/* ── RIGHT: MAP ── */
-#map-area{flex:1;position:relative}
-#map{width:100%;height:100%}
-.leaflet-tile-pane{filter:brightness(.5) saturate(.4) hue-rotate(190deg)}
+    .count-badge {
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--muted);
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 2px;
+    }
 
-/* map stats overlay */
-.map-stats{
-  position:absolute;top:16px;right:16px;z-index:800;
-  background:rgba(14,19,24,.9);border:1px solid var(--border);
-  border-radius:4px;padding:14px 18px;backdrop-filter:blur(6px);
-  font-family:var(--mono);font-size:.7rem;
-  display:flex;flex-direction:column;gap:6px;
-}
-.stat-row{display:flex;justify-content:space-between;gap:24px}
-.stat-label{color:var(--muted)}
-.stat-val{color:var(--text)}
-.stat-val.red{color:var(--red-b)}
+    .nav-link {
+      font-family: var(--mono);
+      font-size: .65rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 1px;
+      border: 1px solid var(--border);
+      padding: 5px 10px;
+      border-radius: 2px;
+      transition: .2s;
+    }
 
-/* ── DONOR MODAL ── */
-.overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.75);z-index:1500;
-  align-items:center;justify-content:center;
-  backdrop-filter:blur(4px);
-}
-.overlay.show{display:flex}
-.modal{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:6px;width:420px;max-width:95vw;
-  padding:28px;animation:modalIn .3s ease;
-}
-@keyframes modalIn{from{transform:scale(.93);opacity:0}to{transform:none;opacity:1}}
-.modal-title{
-  font-family:var(--head);font-size:1.3rem;font-weight:700;
-  color:var(--red-b);letter-spacing:2px;margin-bottom:6px;
-}
-.modal-sub{font-size:.78rem;color:var(--muted);margin-bottom:20px}
-.mfield{margin-bottom:14px}
-.mfield label{display:block;font-family:var(--mono);font-size:.65rem;color:var(--muted);letter-spacing:1px;margin-bottom:6px}
-.mfield input,.mfield select{
-  width:100%;padding:10px 12px;background:var(--panel2);
-  border:1px solid var(--border);color:var(--text);
-  border-radius:3px;font-family:var(--body);font-size:.88rem;
-}
-.modal-btns{display:flex;gap:10px;margin-top:18px}
-.modal-cancel{
-  flex:1;padding:12px;background:transparent;
-  border:1px solid var(--border);color:var(--muted);
-  border-radius:3px;cursor:pointer;font-family:var(--mono);font-size:.75rem;transition:.2s;
-}
-.modal-cancel:hover{border-color:var(--muted);color:var(--text)}
-.modal-confirm{
-  flex:2;padding:12px;background:var(--red);border:none;color:#fff;
-  border-radius:3px;cursor:pointer;font-family:var(--head);font-size:1rem;
-  font-weight:700;letter-spacing:2px;transition:.2s;
-}
-.modal-confirm:hover{background:var(--red-b)}
-.modal-confirm.blue{background:var(--blue)}
-.modal-confirm.blue:hover{background:var(--blue-b)}
+    .nav-link:hover {
+      border-color: var(--red-d);
+      color: var(--text)
+    }
 
-/* ── Ambulance picker ── */
-.ambu-modal-wide{
-  width:540px;max-width:96vw;max-height:90vh;
-  overflow-y:auto;padding:28px;
-}
-.ambu-modal-wide::-webkit-scrollbar{width:3px}
-.ambu-modal-wide::-webkit-scrollbar-thumb{background:var(--blue);border-radius:2px}
+    /* profile avatar icon */
+    .profile-avatar-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: var(--panel2);
+      cursor: pointer;
+      transition: border-color .25s, box-shadow .25s, transform .2s;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
 
-/* step containers */
-#ambu-step-list{display:none}
+    .profile-avatar-btn:hover {
+      border-color: var(--red-b);
+      box-shadow: 0 0 0 3px var(--red-glow), 0 0 16px rgba(231, 76, 60, .25);
+      transform: scale(1.1);
+    }
 
-.ambu-list{
-  display:flex;flex-direction:column;gap:10px;
-  margin:16px 0;
-}
-.ambu-option{
-  background:var(--panel2);border:1px solid var(--border);
-  border-radius:5px;padding:14px 16px;
-  cursor:pointer;transition:border-color .18s,background .18s;
-  position:relative;
-}
-.ambu-option:hover{border-color:var(--blue-b);background:var(--panel3)}
-.ambu-option.selected{
-  border-color:var(--blue-b);
-  background:rgba(13,71,161,.18);
-  box-shadow:0 0 0 2px rgba(66,165,245,.25);
-}
-.ambu-opt-head{
-  display:flex;align-items:center;gap:10px;margin-bottom:8px;
-}
-.ambu-type-icon{
-  font-size:1.1rem;width:36px;height:36px;
-  background:rgba(13,71,161,.25);border:1px solid var(--blue);
-  border-radius:4px;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-.ambu-opt-name{
-  font-weight:500;font-size:.92rem;flex:1;
-}
-.ambu-opt-area{
-  font-family:var(--mono);font-size:.63rem;color:var(--muted);margin-top:2px;
-}
-.ambu-stars{
-  font-size:.75rem;letter-spacing:1px;
-  color:#f9a825;
-}
-.ambu-opt-stats{
-  display:flex;gap:14px;align-items:center;
-  font-family:var(--mono);font-size:.65rem;flex-wrap:wrap;
-}
-.stat-chip{
-  padding:3px 9px;border-radius:2px;background:var(--panel3);
-  border:1px solid var(--border);color:var(--muted);
-}
-.stat-chip.cost{
-  color:var(--blue-b);border-color:rgba(66,165,245,.35);
-}
-.stat-chip.total{
-  color:#fff;background:rgba(13,71,161,.3);border-color:var(--blue-b);
-  font-weight:600;
-}
-.stat-chip.dist{color:var(--text);}
-.ambu-radio{
-  position:absolute;top:14px;right:14px;
-  width:16px;height:16px;border:2px solid var(--border);
-  border-radius:50%;transition:.17s;
-}
-.ambu-option.selected .ambu-radio{
-  border-color:var(--blue-b);
-  background:var(--blue-b);
-  box-shadow:0 0 0 3px rgba(66,165,245,.25);
-}
-.ambu-phone{
-  font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:6px;
-}
-.ambu-loading{
-  text-align:center;padding:30px 0;
-  font-family:var(--mono);font-size:.75rem;color:var(--muted);
-  animation:urgBlink 1.2s step-end infinite;
-}
-.ambu-err{
-  text-align:center;padding:20px;
-  font-family:var(--mono);font-size:.75rem;color:var(--orange-b);
-}
-.ambu-summary{
-  background:rgba(13,71,161,.12);border:1px solid rgba(66,165,245,.25);
-  border-radius:4px;padding:12px 14px;margin-bottom:16px;
-  font-family:var(--mono);font-size:.7rem;line-height:1.8;
-}
-.ambu-summary span{color:var(--blue-b);font-weight:600;}
+    .profile-avatar-btn:active {
+      transform: scale(.95);
+    }
 
-/* ── toast ── */
-#toast{
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(14px);
-  background:var(--panel2);border:1px solid var(--border);padding:12px 22px;
-  border-radius:3px;font-family:var(--mono);font-size:.75rem;
-  opacity:0;transition:.35s;z-index:9999;pointer-events:none;
-}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-#toast.ok{border-color:#2e7d32;color:var(--green-b)}
-#toast.err{border-color:var(--red-d);color:var(--red-b)}
-</style>
+    /* filter bar */
+    .filter-bar {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+
+    .filter-btn {
+      font-family: var(--mono);
+      font-size: .65rem;
+      letter-spacing: 1.5px;
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: .15s;
+    }
+
+    .filter-btn:hover {
+      border-color: var(--muted);
+      color: var(--text)
+    }
+
+    .filter-btn.active {
+      background: var(--red-d);
+      border-color: var(--red);
+      color: #fff
+    }
+
+    /* feed */
+    #feed {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px
+    }
+
+    #feed::-webkit-scrollbar {
+      width: 3px
+    }
+
+    #feed::-webkit-scrollbar-thumb {
+      background: var(--red-d);
+      border-radius: 2px
+    }
+
+    .feed-empty {
+      text-align: center;
+      padding: 60px 20px;
+      font-family: var(--mono);
+      color: var(--muted);
+      font-size: .8rem;
+      line-height: 2;
+    }
+
+    /* ── REQUEST CARD ── */
+    .req-card {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color .2s, transform .15s;
+      animation: slideIn .35s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-12px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .req-card:hover {
+      border-color: var(--red-d);
+      transform: translateX(2px)
+    }
+
+    .req-card.new-flash {
+      animation: newFlash .8s ease, slideIn .35s ease
+    }
+
+    @keyframes newFlash {
+
+      0%,
+      100% {
+        box-shadow: none
+      }
+
+      30% {
+        box-shadow: 0 0 0 3px var(--red-glow), inset 0 0 20px rgba(192, 57, 43, .15)
+      }
+    }
+
+    .card-head {
+      padding: 12px 14px 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .blood-badge {
+      font-family: var(--head);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--red-b);
+      background: rgba(192, 57, 43, .12);
+      width: 52px;
+      height: 52px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 1px solid var(--red-d);
+    }
+
+    .card-meta {
+      flex: 1
+    }
+
+    .card-name {
+      font-weight: 500;
+      font-size: .92rem;
+      margin-bottom: 3px
+    }
+
+    .card-loc {
+      font-family: var(--mono);
+      font-size: .68rem;
+      color: var(--muted)
+    }
+
+    .card-time {
+      font-family: var(--mono);
+      font-size: .63rem;
+      color: var(--muted);
+      margin-top: 2px
+    }
+
+    .urg-pill {
+      font-family: var(--mono);
+      font-size: .6rem;
+      letter-spacing: 1.5px;
+      padding: 3px 8px;
+      border-radius: 2px;
+      align-self: flex-start;
+    }
+
+    .urg-pill.Normal {
+      background: rgba(27, 94, 32, .3);
+      border: 1px solid var(--green);
+      color: var(--green-b)
+    }
+
+    .urg-pill.Urgent {
+      background: rgba(230, 81, 0, .2);
+      border: 1px solid var(--orange);
+      color: var(--orange-b)
+    }
+
+    .urg-pill.Critical {
+      background: rgba(192, 57, 43, .2);
+      border: 1px solid var(--red);
+      color: var(--red-b);
+      animation: urgBlink 1.2s step-end infinite
+    }
+
+    @keyframes urgBlink {
+      50% {
+        opacity: .4
+      }
+    }
+
+    .card-body {
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .compat-tags {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap
+    }
+
+    .compat-tag {
+      font-family: var(--mono);
+      font-size: .6rem;
+      padding: 2px 7px;
+      background: rgba(192, 57, 43, .08);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      color: var(--muted);
+    }
+
+    .donate-btn {
+      font-family: var(--mono);
+      font-size: .65rem;
+      letter-spacing: 1.5px;
+      padding: 7px 16px;
+      background: var(--red);
+      border: none;
+      color: #fff;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .donate-btn:hover {
+      background: var(--red-b)
+    }
+
+    .ambu-btn {
+      font-family: var(--mono);
+      font-size: .65rem;
+      letter-spacing: 1.5px;
+      padding: 7px 16px;
+      background: var(--blue);
+      border: none;
+      color: #fff;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .ambu-btn:hover {
+      background: var(--blue-b)
+    }
+
+    .status-connected {
+      font-family: var(--mono);
+      font-size: .65rem;
+      color: var(--green-b);
+      letter-spacing: 1px;
+    }
+
+    /* ── RIGHT: MAP ── */
+    #map-area {
+      flex: 1;
+      position: relative
+    }
+
+    #map {
+      width: 100%;
+      height: 100%
+    }
+
+    .leaflet-tile-pane {
+      filter: brightness(.5) saturate(.4) hue-rotate(190deg)
+    }
+
+    /* map stats overlay */
+    .map-stats {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 800;
+      background: rgba(14, 19, 24, .9);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 14px 18px;
+      backdrop-filter: blur(6px);
+      font-family: var(--mono);
+      font-size: .7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px
+    }
+
+    .stat-label {
+      color: var(--muted)
+    }
+
+    .stat-val {
+      color: var(--text)
+    }
+
+    .stat-val.red {
+      color: var(--red-b)
+    }
+
+    /* ── DONOR MODAL ── */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .75);
+      z-index: 1500;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .overlay.show {
+      display: flex
+    }
+
+    .modal {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      width: 420px;
+      max-width: 95vw;
+      padding: 28px;
+      animation: modalIn .3s ease;
+    }
+
+    @keyframes modalIn {
+      from {
+        transform: scale(.93);
+        opacity: 0
+      }
+
+      to {
+        transform: none;
+        opacity: 1
+      }
+    }
+
+    .modal-title {
+      font-family: var(--head);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--red-b);
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    .modal-sub {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-bottom: 20px
+    }
+
+    .mfield {
+      margin-bottom: 14px
+    }
+
+    .mfield label {
+      display: block;
+      font-family: var(--mono);
+      font-size: .65rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      margin-bottom: 6px
+    }
+
+    .mfield input,
+    .mfield select {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 3px;
+      font-family: var(--body);
+      font-size: .88rem;
+    }
+
+    .modal-btns {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px
+    }
+
+    .modal-cancel {
+      flex: 1;
+      padding: 12px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 3px;
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: .75rem;
+      transition: .2s;
+    }
+
+    .modal-cancel:hover {
+      border-color: var(--muted);
+      color: var(--text)
+    }
+
+    .modal-confirm {
+      flex: 2;
+      padding: 12px;
+      background: var(--red);
+      border: none;
+      color: #fff;
+      border-radius: 3px;
+      cursor: pointer;
+      font-family: var(--head);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      transition: .2s;
+    }
+
+    .modal-confirm:hover {
+      background: var(--red-b)
+    }
+
+    .modal-confirm.blue {
+      background: var(--blue)
+    }
+
+    .modal-confirm.blue:hover {
+      background: var(--blue-b)
+    }
+
+    /* ── Ambulance picker ── */
+    .ambu-modal-wide {
+      width: 540px;
+      max-width: 96vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+    }
+
+    .ambu-modal-wide::-webkit-scrollbar {
+      width: 3px
+    }
+
+    .ambu-modal-wide::-webkit-scrollbar-thumb {
+      background: var(--blue);
+      border-radius: 2px
+    }
+
+    /* step containers */
+    #ambu-step-list {
+      display: none
+    }
+
+    .ambu-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .ambu-option {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: border-color .18s, background .18s;
+      position: relative;
+    }
+
+    .ambu-option:hover {
+      border-color: var(--blue-b);
+      background: var(--panel3)
+    }
+
+    .ambu-option.selected {
+      border-color: var(--blue-b);
+      background: rgba(13, 71, 161, .18);
+      box-shadow: 0 0 0 2px rgba(66, 165, 245, .25);
+    }
+
+    .ambu-opt-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .ambu-type-icon {
+      font-size: 1.1rem;
+      width: 36px;
+      height: 36px;
+      background: rgba(13, 71, 161, .25);
+      border: 1px solid var(--blue);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .ambu-opt-name {
+      font-weight: 500;
+      font-size: .92rem;
+      flex: 1;
+    }
+
+    .ambu-opt-area {
+      font-family: var(--mono);
+      font-size: .63rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .ambu-stars {
+      font-size: .75rem;
+      letter-spacing: 1px;
+      color: #f9a825;
+    }
+
+    .ambu-opt-stats {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: .65rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-chip {
+      padding: 3px 9px;
+      border-radius: 2px;
+      background: var(--panel3);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .stat-chip.cost {
+      color: var(--blue-b);
+      border-color: rgba(66, 165, 245, .35);
+    }
+
+    .stat-chip.total {
+      color: #fff;
+      background: rgba(13, 71, 161, .3);
+      border-color: var(--blue-b);
+      font-weight: 600;
+    }
+
+    .stat-chip.dist {
+      color: var(--text);
+    }
+
+    .ambu-radio {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      transition: .17s;
+    }
+
+    .ambu-option.selected .ambu-radio {
+      border-color: var(--blue-b);
+      background: var(--blue-b);
+      box-shadow: 0 0 0 3px rgba(66, 165, 245, .25);
+    }
+
+    .ambu-phone {
+      font-family: var(--mono);
+      font-size: .62rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .ambu-loading {
+      text-align: center;
+      padding: 30px 0;
+      font-family: var(--mono);
+      font-size: .75rem;
+      color: var(--muted);
+      animation: urgBlink 1.2s step-end infinite;
+    }
+
+    .ambu-err {
+      text-align: center;
+      padding: 20px;
+      font-family: var(--mono);
+      font-size: .75rem;
+      color: var(--orange-b);
+    }
+
+    .ambu-summary {
+      background: rgba(13, 71, 161, .12);
+      border: 1px solid rgba(66, 165, 245, .25);
+      border-radius: 4px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      font-family: var(--mono);
+      font-size: .7rem;
+      line-height: 1.8;
+    }
+
+    .ambu-summary span {
+      color: var(--blue-b);
+      font-weight: 600;
+    }
+
+    /* ── Location Suggestions ── */
+    .loc-suggest {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 2000;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, .45);
+    }
+
+    .loc-suggest.open {
+      display: block
+    }
+
+    .loc-suggest-item {
+      padding: 9px 14px;
+      cursor: pointer;
+      font-size: .78rem;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      transition: background .12s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .loc-suggest-item:last-child {
+      border-bottom: none
+    }
+
+    .loc-suggest-item:hover {
+      background: var(--panel2)
+    }
+
+    .loc-suggest-item .sug-icon {
+      color: var(--blue-b);
+      font-size: .7rem;
+      flex-shrink: 0
+    }
+
+    .loc-suggest-item .sug-area {
+      font-family: var(--mono);
+      font-size: .58rem;
+      color: var(--muted);
+      margin-left: auto
+    }
+
+    .loc-input-wrap {
+      position: relative
+    }
+
+    /* ── toast ── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(14px);
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      padding: 12px 22px;
+      border-radius: 3px;
+      font-family: var(--mono);
+      font-size: .75rem;
+      opacity: 0;
+      transition: .35s;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
+    }
+
+    #toast.ok {
+      border-color: #2e7d32;
+      color: var(--green-b)
+    }
+
+    #toast.err {
+      border-color: var(--red-d);
+      color: var(--red-b)
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="shell">
+  <div class="shell">
 
-<!-- ── LEFT PANEL ── -->
-<div id="left">
-  <div class="topbar">
-    <div class="live-dot"></div>
-    <div class="logo">RAKHTSETU</div>
-    <div style="font-family:var(--mono);font-size:.65rem;color:var(--muted)">LIVE FEED</div>
-    <div class="topbar-right">
-      <div class="count-badge"><span id="open-count">0</span> OPEN</div>
-      <button class="nav-link" id="top-ambu-btn" style="background:transparent; cursor:pointer;">🚑 AMBULANCE</button>
-      <a href="index.html" class="nav-link">+ REQUEST</a>
-    </div>
-  </div>
+    <!-- ── LEFT PANEL ── -->
+    <div id="left">
+      <div class="topbar">
+        <div class="live-dot"></div>
+        <div class="logo">RAKHTSETU</div>
+        <div style="font-family:var(--mono);font-size:.65rem;color:var(--muted)">LIVE FEED</div>
+        <div class="topbar-right">
+          <div class="count-badge"><span id="open-count">0</span> OPEN</div>
+          <button class="nav-link" id="top-ambu-btn" style="background:transparent; cursor:pointer;">🚑
+            AMBULANCE</button>
+          <a href="index.html" class="nav-link">+ REQUEST</a>
+          <a href="profile.html" class="profile-avatar-btn" id="profile-btn" title="View your donor profile">
+            <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+              <circle cx="18" cy="18" r="17" stroke="#e74c3c" stroke-width="1.5" fill="rgba(192,57,43,.15)"/>
+              <circle cx="18" cy="14" r="5.5" fill="rgba(192,57,43,.35)" stroke="#c0392b" stroke-width="1"/>
+              <path d="M7 32c0-6.075 4.925-11 11-11s11 4.925 11 11" stroke="#c0392b" stroke-width="1.2" stroke-linecap="round" fill="rgba(192,57,43,.12)"/>
+            </svg>
+          </a>
+        </div>
+      </div>
 
-  <div class="filter-bar">
-    <button class="filter-btn active" data-bt="ALL">ALL</button>
-    <button class="filter-btn" data-bt="O-">O−</button>
-    <button class="filter-btn" data-bt="O+">O+</button>
-    <button class="filter-btn" data-bt="A+">A+</button>
-    <button class="filter-btn" data-bt="B+">B+</button>
-    <button class="filter-btn" data-bt="AB-">AB−</button>
-    <button class="filter-btn" data-bt="Critical">⚠ CRITICAL</button>
-  </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" data-bt="ALL">ALL</button>
+        <button class="filter-btn" data-bt="O-">O−</button>
+        <button class="filter-btn" data-bt="O+">O+</button>
+        <button class="filter-btn" data-bt="A+">A+</button>
+        <button class="filter-btn" data-bt="B+">B+</button>
+        <button class="filter-btn" data-bt="AB-">AB−</button>
+        <button class="filter-btn" data-bt="Critical">⚠ CRITICAL</button>
+      </div>
 
-  <div id="feed">
-    <div class="feed-empty" id="feed-empty">
-      WAITING FOR REQUESTS…<br>
-      <span style="font-size:.7rem">Connect to backend at localhost:5000</span>
-    </div>
-  </div>
-</div>
-
-<!-- ── MAP ── -->
-<div id="map-area">
-  <div id="map"></div>
-  <div class="map-stats">
-    <div class="stat-row">
-      <span class="stat-label">ACTIVE REQUESTS</span>
-      <span class="stat-val red" id="s-requests">0</span>
-    </div>
-    <div class="stat-row">
-      <span class="stat-label">BLOOD BANKS</span>
-      <span class="stat-val" id="s-banks">58</span>
-    </div>
-    <div class="stat-row">
-      <span class="stat-label">AMBULANCES</span>
-      <span class="stat-val" id="s-ambs">0</span>
-    </div>
-    <div class="stat-row">
-      <span class="stat-label">CONNECTED</span>
-      <span class="stat-val" id="s-connected">0</span>
-    </div>
-  </div>
-</div>
-
-</div><!-- shell -->
-
-<!-- ── DONOR MODAL ── -->
-<div class="overlay" id="modal">
-  <div class="modal">
-    <div class="modal-title">DONATE BLOOD</div>
-    <div class="modal-sub" id="modal-sub">Match for <b>—</b></div>
-    <input type="hidden" id="modal-req-id">
-
-    <div class="mfield">
-      <label>YOUR NAME</label>
-      <input type="text" id="m-name" placeholder="Full name">
-    </div>
-    <div class="mfield">
-      <label>YOUR BLOOD TYPE</label>
-      <select id="m-blood">
-        <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
-        <option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
-      </select>
-    </div>
-    <div class="mfield">
-      <label>YOUR LOCATION (Lat, Lng)</label>
-      <input type="text" id="m-loc" placeholder="Use GPS or type" readonly>
-    </div>
-    <input type="hidden" id="m-lat">
-    <input type="hidden" id="m-lng">
-
-    <div style="margin-bottom:10px">
-      <button class="filter-btn" id="modal-gps" style="width:100%">📍 GET MY GPS LOCATION</button>
+      <div id="feed">
+        <div class="feed-empty" id="feed-empty">
+          WAITING FOR REQUESTS…<br>
+          <span style="font-size:.7rem">Connect to backend at localhost:5000</span>
+        </div>
+      </div>
     </div>
 
-    <div class="modal-btns">
-      <button class="modal-cancel" id="modal-close">CANCEL</button>
-      <button class="modal-confirm" id="modal-confirm">CONNECT & GET ROUTE →</button>
+    <!-- ── MAP ── -->
+    <div id="map-area">
+      <div id="map"></div>
+      <div class="map-stats">
+        <div class="stat-row">
+          <span class="stat-label">ACTIVE REQUESTS</span>
+          <span class="stat-val red" id="s-requests">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">BLOOD BANKS</span>
+          <span class="stat-val" id="s-banks">58</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">AMBULANCES</span>
+          <span class="stat-val" id="s-ambs">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">CONNECTED</span>
+          <span class="stat-val" id="s-connected">0</span>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- ── AMBULANCE MODAL (two-step) ── -->
-<div class="overlay" id="ambu-modal">
-  <div class="modal ambu-modal-wide">
+  </div><!-- shell -->
 
-    <!-- STEP 1 · GPS -->
-    <div id="ambu-step-gps">
-      <div class="modal-title" style="color:var(--blue-b)">🚑 BOOK AMBULANCE</div>
-      <div class="modal-sub" id="ambu-sub">Share your pickup location to see nearby units</div>
-      <input type="hidden" id="ambu-req-id">
+  <!-- ── DONOR MODAL ── -->
+  <div class="overlay" id="modal">
+    <div class="modal">
+      <div class="modal-title">DONATE BLOOD</div>
+      <div class="modal-sub" id="modal-sub">Match for <b>—</b></div>
+      <input type="hidden" id="modal-req-id">
 
       <div class="mfield">
-        <label>CONTACT NAME</label>
-        <input type="text" id="a-name" placeholder="Full name">
+        <label>YOUR NAME</label>
+        <input type="text" id="m-name" placeholder="Full name">
       </div>
       <div class="mfield">
-        <label>PHONE NUMBER</label>
-        <input type="text" id="a-phone" placeholder="10-digit number">
+        <label>YOUR BLOOD TYPE</label>
+        <select id="m-blood">
+          <option>A+</option>
+          <option>A-</option>
+          <option>B+</option>
+          <option>B-</option>
+          <option>O+</option>
+          <option>O-</option>
+          <option>AB+</option>
+          <option>AB-</option>
+        </select>
       </div>
       <div class="mfield">
-        <label>PICKUP LOCATION</label>
-        <input type="text" id="a-loc" placeholder="Use GPS button below" readonly>
+        <label>YOUR LOCATION (Lat, Lng)</label>
+        <input type="text" id="m-loc" placeholder="Use GPS or type" readonly>
       </div>
-      <input type="hidden" id="a-lat">
-      <input type="hidden" id="a-lng">
+      <input type="hidden" id="m-lat">
+      <input type="hidden" id="m-lng">
 
-      <div style="margin-bottom:16px">
-        <button class="filter-btn" id="ambu-gps" style="width:100%;padding:10px">📍 GET MY GPS LOCATION</button>
+      <div style="margin-bottom:10px">
+        <button class="filter-btn" id="modal-gps" style="width:100%">📍 GET MY GPS LOCATION</button>
       </div>
 
       <div class="modal-btns">
-        <button class="modal-cancel" id="ambu-close-1">CANCEL</button>
-        <button class="modal-confirm blue" id="ambu-next">SEE NEARBY UNITS →</button>
+        <button class="modal-cancel" id="modal-close">CANCEL</button>
+        <button class="modal-confirm" id="modal-confirm">CONNECT & GET ROUTE →</button>
       </div>
     </div>
-
-    <!-- STEP 2 · Pick ambulance -->
-    <div id="ambu-step-list">
-      <div class="modal-title" style="color:var(--blue-b)">🚑 CHOOSE A UNIT</div>
-      <div class="modal-sub" id="ambu-list-sub">Sorted by distance · tap to select</div>
-
-      <div class="ambu-list" id="ambu-list-items"></div>
-
-      <div class="ambu-summary" id="ambu-confirm-summary" style="display:none"></div>
-
-      <div class="modal-btns">
-        <button class="modal-cancel" id="ambu-back">← BACK</button>
-        <button class="modal-confirm blue" id="ambu-confirm">CONFIRM BOOKING →</button>
-      </div>
-    </div>
-
   </div>
-</div>
 
-<div id="toast"></div>
+  <!-- ── AMBULANCE MODAL (two-step) ── -->
+  <div class="overlay" id="ambu-modal">
+    <div class="modal ambu-modal-wide">
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-const API = "http://localhost:5000";
+      <!-- STEP 1 · Pickup & Dropoff -->
+      <div id="ambu-step-gps">
+        <div class="modal-title" style="color:var(--blue-b)">🚑 BOOK AMBULANCE</div>
+        <div class="modal-sub" id="ambu-sub">Enter pickup & dropoff to get nearby units with cost estimates</div>
+        <input type="hidden" id="ambu-req-id">
 
-// ── MAP ─────────────────────────────────────────────────────────
-const map = L.map('map',{zoomControl:false}).setView([19.076,72.877],11);
-L.control.zoom({position:'bottomright'}).addTo(map);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  {attribution:'© OpenStreetMap'}).addTo(map);
+        <div class="mfield">
+          <label>CONTACT NAME</label>
+          <input type="text" id="a-name" placeholder="Full name">
+        </div>
+        <div class="mfield">
+          <label>PHONE NUMBER</label>
+          <input type="text" id="a-phone" placeholder="10-digit number">
+        </div>
 
-const mkIcon = (color,size=10,radius='50%') => L.divIcon({
-  className:'',
-  html:`<div style="width:${size}px;height:${size}px;background:${color};
+        <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:4px">
+          <div class="mfield loc-input-wrap" style="flex:1;margin-bottom:0">
+            <label>📍 PICKUP LOCATION</label>
+            <input type="text" id="a-loc" placeholder="Type a location… e.g. Dadar" autocomplete="off">
+            <div class="loc-suggest" id="pickup-suggest"></div>
+          </div>
+          <button class="filter-btn" id="ambu-gps-pickup" style="padding:10px 12px;flex-shrink:0;margin-bottom:1px"
+            title="Use GPS">📡 GPS</button>
+        </div>
+        <input type="hidden" id="a-lat">
+        <input type="hidden" id="a-lng">
+        <div style="font-family:var(--mono);font-size:.58rem;color:var(--muted);margin-bottom:14px;padding-left:2px"
+          id="pickup-coords-display"></div>
+
+        <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:4px">
+          <div class="mfield loc-input-wrap" style="flex:1;margin-bottom:0">
+            <label>📌 DROPOFF LOCATION</label>
+            <input type="text" id="a-drop" placeholder="Type a location… e.g. KEM Hospital" autocomplete="off">
+            <div class="loc-suggest" id="drop-suggest"></div>
+          </div>
+          <button class="filter-btn" id="ambu-gps-drop" style="padding:10px 12px;flex-shrink:0;margin-bottom:1px"
+            title="Use GPS for drop">📡 GPS</button>
+        </div>
+        <input type="hidden" id="a-drop-lat">
+        <input type="hidden" id="a-drop-lng">
+        <div style="font-family:var(--mono);font-size:.58rem;color:var(--muted);margin-bottom:14px;padding-left:2px"
+          id="drop-coords-display"></div>
+
+        <div class="modal-btns">
+          <button class="modal-cancel" id="ambu-close-1">CANCEL</button>
+          <button class="modal-confirm blue" id="ambu-next">FIND NEAREST UNITS →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2 · Pick ambulance -->
+      <div id="ambu-step-list">
+        <div class="modal-title" style="color:var(--blue-b)">🚑 CHOOSE A UNIT</div>
+        <div class="modal-sub" id="ambu-list-sub">Sorted by distance · tap to select</div>
+
+        <div class="ambu-list" id="ambu-list-items"></div>
+
+        <div class="ambu-summary" id="ambu-confirm-summary" style="display:none"></div>
+
+        <div class="modal-btns">
+          <button class="modal-cancel" id="ambu-back">← BACK</button>
+          <button class="modal-confirm blue" id="ambu-confirm">CONFIRM BOOKING →</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const API = "http://localhost:5000";
+
+    // ── Auth guard: must be registered ──────────────────────────────
+    const donor = JSON.parse(localStorage.getItem('donor') || 'null');
+    if (!donor || !donor.id) {
+      window.location.href = 'register.html';
+    }
+    const donationHistory = JSON.parse(localStorage.getItem('donationHistory') || '[]');
+    const MIN_GAP_DAYS = 100;
+
+    // ── MAP ─────────────────────────────────────────────────────────
+    const map = L.map('map', { zoomControl: false }).setView([19.076, 72.877], 11);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      { attribution: '© OpenStreetMap' }).addTo(map);
+
+    const mkIcon = (color, size = 10, radius = '50%') => L.divIcon({
+      className: '',
+      html: `<div style="width:${size}px;height:${size}px;background:${color};
         border-radius:${radius};border:1.5px solid rgba(255,255,255,.3);
         box-shadow:0 0 5px ${color}66"></div>`,
-  iconSize:[size,size]
-});
+      iconSize: [size, size]
+    });
 
-const bankIcon = mkIcon('#8a0303',10);
-const ambuIcon = mkIcon('#1565c0',12,'2px');
-const reqIcon  = mkIcon('#e74c3c',14);
+    const bankIcon = mkIcon('#8a0303', 10);
+    const ambuIcon = mkIcon('#1565c0', 12, '2px');
+    const reqIcon = mkIcon('#e74c3c', 14);
 
-// ── State ────────────────────────────────────────────────────────
-const requests = {};        // id → record
-const markers  = {};        // id → L.marker
-let   activeFilter = 'ALL';
-let   openCount    = 0;
-let   connectedCount = 0;
-let   routeLayer   = null;
+    // ── State ────────────────────────────────────────────────────────
+    const requests = {};        // id → record
+    const markers = {};        // id → L.marker
+    let activeFilter = 'ALL';
+    let openCount = 0;
+    let connectedCount = 0;
+    let routeLayer = null;
 
-// ── Load static data ─────────────────────────────────────────────
-fetch(`${API}/api/banks`).then(r=>r.json()).then(d=>{
-  d.blood_banks.forEach(b=>{
-    L.marker([b.lat,b.lng],{icon:bankIcon}).addTo(map)
-     .bindPopup(`<b>${b.name}</b><br>${b.address}<br>📞 ${b.phone}`);
-  });
-  d.ambulances.forEach(a=>{
-    L.marker([a.lat,a.lng],{icon:ambuIcon}).addTo(map)
-     .bindPopup(`<b>${a.name}</b><br>${a.type}<br>📞 ${a.phone}`);
-  });
-  document.getElementById('s-banks').textContent = d.blood_banks.length;
-  document.getElementById('s-ambs').textContent  = d.ambulances.length;
-}).catch(()=>{});
+    // ── Load static data ─────────────────────────────────────────────
+    fetch(`${API}/api/banks`).then(r => r.json()).then(d => {
+      d.blood_banks.forEach(b => {
+        L.marker([b.lat, b.lng], { icon: bankIcon }).addTo(map)
+          .bindPopup(`<b>${b.name}</b><br>${b.address}<br>📞 ${b.phone}`);
+      });
+      d.ambulances.forEach(a => {
+        L.marker([a.lat, a.lng], { icon: ambuIcon }).addTo(map)
+          .bindPopup(`<b>${a.name}</b><br>${a.type}<br>📞 ${a.phone}`);
+      });
+      document.getElementById('s-banks').textContent = d.blood_banks.length;
+      document.getElementById('s-ambs').textContent = d.ambulances.length;
+    }).catch(() => { });
 
-// ── Load existing feed snapshot ──────────────────────────────────
-async function loadSnapshot(){
-  try{
-    const r = await fetch(`${API}/api/feed?per_page=50`);
-    const d = await r.json();
-    d.items.forEach(req => ingestRequest(req, false));
-    updateStats();
-  }catch(e){ console.warn('Backend offline',e); }
-}
-loadSnapshot();
-
-// ── SSE: live feed ───────────────────────────────────────────────
-function connectSSE(){
-  const es = new EventSource(`${API}/api/stream/feed`);
-  es.onmessage = e => {
-    const msg = JSON.parse(e.data);
-    if(msg.event === 'new_request'){
-      ingestRequest(msg.data, true);
-      updateStats();
-    } else if(msg.event === 'request_connected'){
-      markConnected(msg.data.req_id, msg.data.donor_name);
-      updateStats();
+    // ── Load existing feed snapshot ──────────────────────────────────
+    async function loadSnapshot() {
+      try {
+        const r = await fetch(`${API}/api/feed?per_page=50`);
+        const d = await r.json();
+        d.items.forEach(req => ingestRequest(req, false));
+        updateStats();
+      } catch (e) { console.warn('Backend offline', e); }
     }
-  };
-  es.onerror = ()=> setTimeout(connectSSE, 3000);
-}
-connectSSE();
+    loadSnapshot();
 
-// ── Ingest a request into state + DOM ────────────────────────────
-function ingestRequest(req, flash=false){
-  if(requests[req.id]) return;
-  requests[req.id] = req;
-  if(req.status === 'open') openCount++;
+    // ── SSE: live feed ───────────────────────────────────────────────
+    function connectSSE() {
+      const es = new EventSource(`${API}/api/stream/feed`);
+      es.onmessage = e => {
+        const msg = JSON.parse(e.data);
+        if (msg.event === 'new_request') {
+          ingestRequest(msg.data, true);
+          updateStats();
+        } else if (msg.event === 'request_connected') {
+          markConnected(msg.data.req_id, msg.data.donor_name);
+          updateStats();
+        }
+      };
+      es.onerror = () => setTimeout(connectSSE, 3000);
+    }
+    connectSSE();
 
-  // Map marker (approximate area — no raw coords exposed on dashboard)
-  // We jitter slightly so stacked pins don't overlap
-  const jLat = (Math.random()-.5)*.005;
-  const jLng = (Math.random()-.5)*.005;
-  // Use first nearby bank as proxy center (backend sends those)
-  // Fallback: Mumbai center
-  let lat=19.076, lng=72.877;
-  if(req.nearby_banks && req.nearby_banks.length){
-    lat = req.nearby_banks[0].lat + jLat;
-    lng = req.nearby_banks[0].lng + jLng;
-  }
+    // ── Ingest a request into state + DOM ────────────────────────────
+    function ingestRequest(req, flash = false) {
+      if (requests[req.id]) return;
+      requests[req.id] = req;
+      if (req.status === 'open') openCount++;
 
-  const m = L.marker([lat,lng],{icon:reqIcon}).addTo(map)
-    .bindPopup(`<b>${req.blood_type}</b> · ${req.name}<br>${req.urgency}<br>${req.address_label}`);
-  markers[req.id] = {marker:m, lat, lng};
+      // Map marker (approximate area — no raw coords exposed on dashboard)
+      // We jitter slightly so stacked pins don't overlap
+      const jLat = (Math.random() - .5) * .005;
+      const jLng = (Math.random() - .5) * .005;
+      // Use first nearby bank as proxy center (backend sends those)
+      // Fallback: Mumbai center
+      let lat = 19.076, lng = 72.877;
+      if (req.nearby_banks && req.nearby_banks.length) {
+        lat = req.nearby_banks[0].lat + jLat;
+        lng = req.nearby_banks[0].lng + jLng;
+      }
 
-  renderCard(req, flash);
-  document.getElementById('feed-empty').style.display='none';
-}
+      const m = L.marker([lat, lng], { icon: reqIcon }).addTo(map)
+        .bindPopup(`<b>${req.blood_type}</b> · ${req.name}<br>${req.urgency}<br>${req.address_label}`);
+      markers[req.id] = { marker: m, lat, lng };
 
-// ── Render card ──────────────────────────────────────────────────
-function renderCard(req, flash=false){
-  const feed = document.getElementById('feed');
-  const card = document.createElement('div');
-  card.className = 'req-card' + (flash?' new-flash':'');
-  card.id = 'card-'+req.id;
-  card.dataset.bt  = req.blood_type;
-  card.dataset.urg = req.urgency;
+      renderCard(req, flash);
+      document.getElementById('feed-empty').style.display = 'none';
+    }
 
-  const compat = (req.compatible||[]).slice(0,4).map(t=>
-    `<span class="compat-tag">${t}</span>`).join('');
+    // ── Render card ──────────────────────────────────────────────────
+    function renderCard(req, flash = false) {
+      const feed = document.getElementById('feed');
+      const card = document.createElement('div');
+      card.className = 'req-card' + (flash ? ' new-flash' : '');
+      card.id = 'card-' + req.id;
+      card.dataset.bt = req.blood_type;
+      card.dataset.urg = req.urgency;
 
-  card.innerHTML = `
+      const compat = (req.compatible || []).slice(0, 4).map(t =>
+        `<span class="compat-tag">${t}</span>`).join('');
+
+      card.innerHTML = `
     <div class="card-head">
       <div class="blood-badge">${req.blood_type}</div>
       <div class="card-meta">
         <div class="card-name">${req.name}</div>
-        <div class="card-loc">📍 ${req.address_label||'—'}</div>
+        <div class="card-loc">📍 ${req.address_label || '—'}</div>
         <div class="card-time">${timeAgo(req.timestamp)}</div>
       </div>
       <div class="urg-pill ${req.urgency}">${req.urgency.toUpperCase()}</div>
@@ -596,280 +1187,370 @@ function renderCard(req, flash=false){
       </div>
     </div>`;
 
-  // Click card → fly map
-  card.addEventListener('click', e=>{
-    if(e.target.classList.contains('donate-btn')) return;
-    const m = markers[req.id];
-    if(m) map.flyTo([m.lat, m.lng], 14, {duration:1.2});
-  });
+      // Click card → fly map
+      card.addEventListener('click', e => {
+        if (e.target.classList.contains('donate-btn')) return;
+        const m = markers[req.id];
+        if (m) map.flyTo([m.lat, m.lng], 14, { duration: 1.2 });
+      });
 
-  // Donate button
-  card.querySelector('.donate-btn').addEventListener('click', e=>{
-    e.stopPropagation();
-    openModal(req);
-  });
+      // Donate button
+      card.querySelector('.donate-btn').addEventListener('click', e => {
+        e.stopPropagation();
+        openModal(req);
+      });
 
-  // Ambulance button
-  const ambuBtn = card.querySelector('.ambu-btn');
-  if(ambuBtn){
-    ambuBtn.addEventListener('click', e=>{
-      e.stopPropagation();
-      openAmbuModal(req);
-    });
-  }
+      // Ambulance button
+      const ambuBtn = card.querySelector('.ambu-btn');
+      if (ambuBtn) {
+        ambuBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          openAmbuModal(req);
+        });
+      }
 
-  // Prepend newest
-  feed.insertBefore(card, feed.firstChild);
-  applyFilter();
-}
-
-function markConnected(reqId, donorName){
-  const req = requests[reqId];
-  if(req){
-    req.status = 'connected';
-    openCount = Math.max(0, openCount-1);
-    connectedCount++;
-  }
-  const card = document.getElementById('card-'+reqId);
-  if(card){
-    const btn = card.querySelector('.donate-btn');
-    if(btn){
-      btn.outerHTML = `<span class="status-connected">✓ ${donorName} CONNECTED</span>`;
+      // Prepend newest
+      feed.insertBefore(card, feed.firstChild);
+      applyFilter();
     }
-  }
-}
 
-// ── Filter ───────────────────────────────────────────────────────
-document.querySelectorAll('.filter-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    activeFilter = btn.dataset.bt;
-    applyFilter();
-  });
-});
-
-function applyFilter(){
-  document.querySelectorAll('.req-card').forEach(card=>{
-    const bt  = card.dataset.bt;
-    const urg = card.dataset.urg;
-    if(activeFilter==='ALL' || bt===activeFilter || urg===activeFilter){
-      card.style.display='block';
-    } else {
-      card.style.display='none';
+    function markConnected(reqId, donorName) {
+      const req = requests[reqId];
+      if (req) {
+        req.status = 'connected';
+        openCount = Math.max(0, openCount - 1);
+        connectedCount++;
+      }
+      const card = document.getElementById('card-' + reqId);
+      if (card) {
+        const btn = card.querySelector('.donate-btn');
+        if (btn) {
+          btn.outerHTML = `<span class="status-connected">✓ ${donorName} CONNECTED</span>`;
+        }
+      }
     }
-  });
-}
 
-function updateStats(){
-  document.getElementById('open-count').textContent  = openCount;
-  document.getElementById('s-requests').textContent  = openCount;
-  document.getElementById('s-connected').textContent = connectedCount;
-}
-
-// ── Donor Modal ──────────────────────────────────────────────────
-let modalReq = null;
-function openModal(req){
-  modalReq = req;
-  document.getElementById('modal-req-id').value = req.id;
-  document.getElementById('modal-sub').innerHTML =
-    `Donating for <b>${req.name}</b> · Blood type needed: <b>${req.blood_type}</b>`;
-  document.getElementById('modal').classList.add('show');
-}
-
-document.getElementById('modal-close').addEventListener('click',()=>{
-  document.getElementById('modal').classList.remove('show');
-});
-document.getElementById('modal').addEventListener('click', e=>{
-  if(e.target===document.getElementById('modal'))
-    document.getElementById('modal').classList.remove('show');
-});
-
-// GPS for donor
-document.getElementById('modal-gps').addEventListener('click',()=>{
-  if(!navigator.geolocation){ toast('GPS not supported','err'); return; }
-  navigator.geolocation.getCurrentPosition(p=>{
-    document.getElementById('m-lat').value = p.coords.latitude;
-    document.getElementById('m-lng').value = p.coords.longitude;
-    document.getElementById('m-loc').value =
-      `${p.coords.latitude.toFixed(5)}, ${p.coords.longitude.toFixed(5)}`;
-  }, e=>toast('GPS: '+e.message,'err'),{enableHighAccuracy:true});
-});
-
-document.getElementById('modal-confirm').addEventListener('click', async ()=>{
-  const name  = document.getElementById('m-name').value.trim();
-  const blood = document.getElementById('m-blood').value;
-  const lat   = parseFloat(document.getElementById('m-lat').value);
-  const lng   = parseFloat(document.getElementById('m-lng').value);
-  const reqId = document.getElementById('modal-req-id').value;
-
-  if(!name){ toast('Enter your name','err'); return; }
-  if(!lat||!lng){ toast('Get your GPS location first','err'); return; }
-
-  const btn = document.getElementById('modal-confirm');
-  btn.textContent = 'CONNECTING…'; btn.disabled=true;
-
-  try{
-    const res = await fetch(`${API}/api/connect`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        req_id: reqId, donor_name: name,
-        donor_blood_type: blood,
-        donor_lat: lat, donor_lng: lng,
-      })
+    // ── Filter ───────────────────────────────────────────────────────
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.bt;
+        applyFilter();
+      });
     });
-    const data = await res.json();
-    if(!res.ok) throw new Error(data.error||'Error');
 
-    document.getElementById('modal').classList.remove('show');
-    toast('✓ Connected! Route computed. Redirecting to chat…','ok');
+    function applyFilter() {
+      document.querySelectorAll('.req-card').forEach(card => {
+        const bt = card.dataset.bt;
+        const urg = card.dataset.urg;
+        if (activeFilter === 'ALL' || bt === activeFilter || urg === activeFilter) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
 
-    // Draw A* route on map
-    drawRoute(data.route, lat, lng, data.recipient_coords.lat, data.recipient_coords.lng);
+    function updateStats() {
+      document.getElementById('open-count').textContent = openCount;
+      document.getElementById('s-requests').textContent = openCount;
+      document.getElementById('s-connected').textContent = connectedCount;
+    }
 
-    setTimeout(()=>{
-      window.location.href =
-        `chat.html?room=${reqId}&role=donor&name=${encodeURIComponent(name)}`;
-    }, 2200);
+    // ── Donor Modal ──────────────────────────────────────────────────
+    let modalReq = null;
+    function openModal(req) {
+      // ── 100-day cooldown check ──
+      if (donationHistory.length > 0) {
+        const sorted = [...donationHistory].sort((a, b) => new Date(b.date) - new Date(a.date));
+        const last = new Date(sorted[0].date);
+        const now = new Date();
+        const daysSince = Math.floor((now - last) / (1000 * 60 * 60 * 24));
+        if (daysSince < MIN_GAP_DAYS) {
+          const daysLeft = MIN_GAP_DAYS - daysSince;
+          toast(`⏳ You must wait ${daysLeft} more day(s) before donating again (100-day policy)`, 'err');
+          return;
+        }
+      }
 
-  }catch(e){
-    toast('Error: '+e.message,'err');
-  }finally{
-    btn.textContent='CONNECT & GET ROUTE →'; btn.disabled=false;
-  }
-});
+      modalReq = req;
+      document.getElementById('modal-req-id').value = req.id;
+      document.getElementById('modal-sub').innerHTML =
+        `Donating for <b>${req.name}</b> · Blood type needed: <b>${req.blood_type}</b>`;
 
-// ── Draw A* route ────────────────────────────────────────────────
-function drawRoute(route, dLat, dLng, rLat, rLng){
-  if(!route||!route.waypoints) return;
-  if(routeLayer) map.removeLayer(routeLayer);
+      // Auto-fill from registered donor profile
+      if (donor) {
+        document.getElementById('m-name').value = donor.name || '';
+        document.getElementById('m-blood').value = donor.blood_type || 'O+';
+        if (donor.latitude && donor.longitude) {
+          document.getElementById('m-lat').value = donor.latitude;
+          document.getElementById('m-lng').value = donor.longitude;
+          document.getElementById('m-loc').value =
+            `${parseFloat(donor.latitude).toFixed(5)}, ${parseFloat(donor.longitude).toFixed(5)}`;
+        }
+      }
 
-  const coords = route.waypoints.map(w=>[w[0],w[1]]);
-  routeLayer = L.polyline(coords,{
-    color:'#e74c3c', weight:3, opacity:.85,
-    dashArray:'6 4',
-  }).addTo(map);
+      document.getElementById('modal').classList.add('show');
+    }
 
-  // Donor marker
-  L.marker([dLat,dLng], {icon: mkIcon('#42a5f5',14)}).addTo(map)
-   .bindPopup('🩸 You (Donor)').openPopup();
+    document.getElementById('modal-close').addEventListener('click', () => {
+      document.getElementById('modal').classList.remove('show');
+    });
+    document.getElementById('modal').addEventListener('click', e => {
+      if (e.target === document.getElementById('modal'))
+        document.getElementById('modal').classList.remove('show');
+    });
 
-  // Recipient marker
-  L.marker([rLat,rLng], {icon: mkIcon('#e74c3c',16)}).addTo(map)
-   .bindPopup('❤️ Recipient');
+    // GPS for donor
+    document.getElementById('modal-gps').addEventListener('click', () => {
+      if (!navigator.geolocation) { toast('GPS not supported', 'err'); return; }
+      navigator.geolocation.getCurrentPosition(p => {
+        document.getElementById('m-lat').value = p.coords.latitude;
+        document.getElementById('m-lng').value = p.coords.longitude;
+        document.getElementById('m-loc').value =
+          `${p.coords.latitude.toFixed(5)}, ${p.coords.longitude.toFixed(5)}`;
+      }, e => toast('GPS: ' + e.message, 'err'), { enableHighAccuracy: true });
+    });
 
-  map.fitBounds(routeLayer.getBounds(), {padding:[40,40]});
-}
+    document.getElementById('modal-confirm').addEventListener('click', async () => {
+      const name = document.getElementById('m-name').value.trim();
+      const blood = document.getElementById('m-blood').value;
+      const lat = parseFloat(document.getElementById('m-lat').value);
+      const lng = parseFloat(document.getElementById('m-lng').value);
+      const reqId = document.getElementById('modal-req-id').value;
 
-// ── Ambulance Modal (two-step) ────────────────────────────────────
-let ambuReq = null;
-let ambuSelected = null;  // chosen ambulance object
+      if (!name) { toast('Enter your name', 'err'); return; }
+      if (!lat || !lng) { toast('Get your GPS location first', 'err'); return; }
 
-function starsHtml(rating){
-  const full  = Math.floor(rating);
-  const half  = rating - full >= 0.5 ? 1 : 0;
-  const empty = 5 - full - half;
-  return '★'.repeat(full) + (half?'½':'') + '☆'.repeat(empty) + ` ${rating.toFixed(1)}`;
-}
+      const btn = document.getElementById('modal-confirm');
+      btn.textContent = 'CONNECTING…'; btn.disabled = true;
 
-function openAmbuModal(req){
-  ambuReq = req;
-  ambuSelected = null;
-  document.getElementById('ambu-req-id').value = req ? req.id : '';
-  document.getElementById('ambu-sub').innerHTML = req ?
-    `Booking for <b>${req.name}</b> · ${req.address_label||''}` :
-    'Share your pickup location to see nearby units';
-  // Reset to step 1
-  document.getElementById('ambu-step-gps').style.display = '';
-  document.getElementById('ambu-step-list').style.display = 'none';
-  document.getElementById('ambu-confirm-summary').style.display = 'none';
-  document.getElementById('ambu-list-items').innerHTML = '';
-  document.getElementById('ambu-modal').classList.add('show');
-}
+      try {
+        const res = await fetch(`${API}/api/connect`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            req_id: reqId, donor_name: name,
+            donor_blood_type: blood,
+            donor_lat: lat, donor_lng: lng,
+            donor_id: donor ? donor.id : '',
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          // Handle 100-day cooldown error specifically
+          if (res.status === 429 && data.days_remaining) {
+            toast(`⏳ You can donate again in ${data.days_remaining} day(s). (100-day policy)`, 'err');
+            return;
+          }
+          throw new Error(data.error || 'Error');
+        }
 
-// Close buttons
-function closeAmbuModal(){
-  document.getElementById('ambu-modal').classList.remove('show');
-}
-document.getElementById('ambu-close-1').addEventListener('click', closeAmbuModal);
-document.getElementById('ambu-back').addEventListener('click',()=>{
-  document.getElementById('ambu-step-list').style.display = 'none';
-  document.getElementById('ambu-step-gps').style.display  = '';
-});
-document.getElementById('ambu-modal').addEventListener('click', e=>{
-  if(e.target === document.getElementById('ambu-modal')) closeAmbuModal();
-});
-document.getElementById('top-ambu-btn').addEventListener('click', ()=> openAmbuModal(null));
+        // ── Save donation record to localStorage ──
+        if (data.donation) {
+          donationHistory.push(data.donation);
+          localStorage.setItem('donationHistory', JSON.stringify(donationHistory));
+        }
 
-// GPS button
-document.getElementById('ambu-gps').addEventListener('click',()=>{
-  if(!navigator.geolocation){ toast('GPS not supported','err'); return; }
-  const btn = document.getElementById('ambu-gps');
-  btn.textContent = '📡 FETCHING…'; btn.disabled = true;
-  navigator.geolocation.getCurrentPosition(p=>{
-    document.getElementById('a-lat').value = p.coords.latitude;
-    document.getElementById('a-lng').value = p.coords.longitude;
-    document.getElementById('a-loc').value =
-      `${p.coords.latitude.toFixed(5)}, ${p.coords.longitude.toFixed(5)}`;
-    btn.textContent = '✓ LOCATION CAPTURED'; btn.disabled = false;
-  }, e=>{ toast('GPS: '+e.message,'err'); btn.textContent='📍 GET MY GPS LOCATION'; btn.disabled=false; },
-  {enableHighAccuracy:true});
-});
+        document.getElementById('modal').classList.remove('show');
+        toast('✓ Connected! Donation recorded. Redirecting to chat…', 'ok');
 
-// NEXT → fetch ambulances and move to step 2
-document.getElementById('ambu-next').addEventListener('click', async ()=>{
-  const name  = document.getElementById('a-name').value.trim();
-  const phone = document.getElementById('a-phone').value.trim();
-  const lat   = parseFloat(document.getElementById('a-lat').value);
-  const lng   = parseFloat(document.getElementById('a-lng').value);
+        // Draw A* route on map
+        drawRoute(data.route, lat, lng, data.recipient_coords.lat, data.recipient_coords.lng);
 
-  if(!name || !phone){ toast('Enter name and phone number','err'); return; }
-  if(!lat || !lng){ toast('Capture your GPS location first','err'); return; }
+        setTimeout(() => {
+          window.location.href =
+            `chat.html?room=${reqId}&role=donor&name=${encodeURIComponent(name)}`;
+        }, 2200);
 
-  const nextBtn = document.getElementById('ambu-next');
-  nextBtn.textContent = 'LOADING…'; nextBtn.disabled = true;
+      } catch (e) {
+        toast('Error: ' + e.message, 'err');
+      } finally {
+        btn.textContent = 'CONNECT & GET ROUTE →'; btn.disabled = false;
+      }
+    });
 
-  try{
-    const res = await fetch(`${API}/api/ambulances?lat=${lat}&lng=${lng}&n=6`);
-    if(!res.ok) throw new Error('Backend error');
-    const data = await res.json();
+    // ── Draw A* route ────────────────────────────────────────────────
+    function drawRoute(route, dLat, dLng, rLat, rLng) {
+      if (!route || !route.waypoints) return;
+      if (routeLayer) map.removeLayer(routeLayer);
 
-    renderAmbuList(data.ambulances, lat, lng);
+      const coords = route.waypoints.map(w => [w[0], w[1]]);
+      routeLayer = L.polyline(coords, {
+        color: '#e74c3c', weight: 3, opacity: .85,
+        dashArray: '6 4',
+      }).addTo(map);
 
-    document.getElementById('ambu-step-gps').style.display = 'none';
-    document.getElementById('ambu-step-list').style.display = '';
-    document.getElementById('ambu-list-sub').textContent =
-      `${data.ambulances.length} units nearby · tap to select`;
-  }catch(e){
-    toast('Could not load ambulances: '+e.message,'err');
-  }finally{
-    nextBtn.textContent = 'SEE NEARBY UNITS →'; nextBtn.disabled = false;
-  }
-});
+      // Donor marker
+      L.marker([dLat, dLng], { icon: mkIcon('#42a5f5', 14) }).addTo(map)
+        .bindPopup('🩸 You (Donor)').openPopup();
 
-function renderAmbuList(units, userLat, userLng){
-  const container = document.getElementById('ambu-list-items');
-  container.innerHTML = '';
-  ambuSelected = null;
-  document.getElementById('ambu-confirm-summary').style.display = 'none';
+      // Recipient marker
+      L.marker([rLat, rLng], { icon: mkIcon('#e74c3c', 16) }).addTo(map)
+        .bindPopup('❤️ Recipient');
 
-  if(!units.length){
-    container.innerHTML = '<div class="ambu-err">No ambulances found near your location.</div>';
-    return;
-  }
+      map.fitBounds(routeLayer.getBounds(), { padding: [40, 40] });
+    }
 
-  units.forEach((u, i)=>{
-    const typeIcon = u.type === 'ambulance' ? '🚑' : '🚐';
-    const typeLabel = u.type === 'ambulance' ? 'AMBULANCE' : 'MOBILE VAN';
-    const distText = u.distance_km >= 1
-      ? `${u.distance_km.toFixed(1)} km`
-      : `${u.distance_m} m`;
+    // ── Ambulance Modal (two-step) ────────────────────────────────────
+    let ambuReq = null;
+    let ambuSelected = null;  // chosen ambulance object
 
-    const div = document.createElement('div');
-    div.className = 'ambu-option';
-    div.dataset.idx = i;
-    div.innerHTML = `
+    function starsHtml(rating) {
+      const full = Math.floor(rating);
+      const half = rating - full >= 0.5 ? 1 : 0;
+      const empty = 5 - full - half;
+      return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(empty) + ` ${rating.toFixed(1)}`;
+    }
+
+    function openAmbuModal(req) {
+      ambuReq = req;
+      ambuSelected = null;
+      document.getElementById('ambu-req-id').value = req ? req.id : '';
+      document.getElementById('ambu-sub').innerHTML = req ?
+        `Booking for <b>${req.name}</b> · ${req.address_label || ''}` :
+        'Enter pickup & dropoff to get nearby units with cost estimates';
+
+      // Auto-fill from registered donor profile
+      if (donor) {
+        document.getElementById('a-name').value = donor.name || '';
+        document.getElementById('a-phone').value = donor.phone || '';
+        if (donor.latitude && donor.longitude) {
+          document.getElementById('a-lat').value = donor.latitude;
+          document.getElementById('a-lng').value = donor.longitude;
+          document.getElementById('a-loc').value = '';
+          document.getElementById('pickup-coords-display').textContent =
+            `GPS: ${parseFloat(donor.latitude).toFixed(5)}, ${parseFloat(donor.longitude).toFixed(5)}`;
+        }
+      }
+
+      // Reset dropoff
+      document.getElementById('a-drop').value = '';
+      document.getElementById('a-drop-lat').value = '';
+      document.getElementById('a-drop-lng').value = '';
+      document.getElementById('drop-coords-display').textContent = '';
+
+      // Reset to step 1
+      document.getElementById('ambu-step-gps').style.display = 'block';
+      document.getElementById('ambu-step-list').style.display = 'none';
+      document.getElementById('ambu-confirm-summary').style.display = 'none';
+      document.getElementById('ambu-list-items').innerHTML = '';
+      document.getElementById('ambu-modal').classList.add('show');
+    }
+
+    // Close buttons
+    function closeAmbuModal() {
+      document.getElementById('ambu-modal').classList.remove('show');
+    }
+    document.getElementById('ambu-close-1').addEventListener('click', closeAmbuModal);
+    document.getElementById('ambu-back').addEventListener('click', () => {
+      document.getElementById('ambu-step-list').style.display = 'none';
+      document.getElementById('ambu-step-gps').style.display = 'block';
+    });
+    document.getElementById('ambu-modal').addEventListener('click', e => {
+      if (e.target === document.getElementById('ambu-modal')) closeAmbuModal();
+    });
+    document.getElementById('top-ambu-btn').addEventListener('click', () => openAmbuModal(null));
+
+    // GPS button — Pickup
+    document.getElementById('ambu-gps-pickup').addEventListener('click', () => {
+      if (!navigator.geolocation) { toast('GPS not supported', 'err'); return; }
+      const btn = document.getElementById('ambu-gps-pickup');
+      btn.textContent = '📡…'; btn.disabled = true;
+      navigator.geolocation.getCurrentPosition(p => {
+        document.getElementById('a-lat').value = p.coords.latitude;
+        document.getElementById('a-lng').value = p.coords.longitude;
+        document.getElementById('pickup-coords-display').textContent =
+          `GPS: ${p.coords.latitude.toFixed(5)}, ${p.coords.longitude.toFixed(5)}`;
+        btn.textContent = '✓'; btn.disabled = false;
+        toast('Pickup GPS captured', 'ok');
+      }, e => { toast('GPS: ' + e.message, 'err'); btn.textContent = '📡 GPS'; btn.disabled = false; },
+        { enableHighAccuracy: true });
+    });
+
+    // GPS button — Dropoff
+    document.getElementById('ambu-gps-drop').addEventListener('click', () => {
+      if (!navigator.geolocation) { toast('GPS not supported', 'err'); return; }
+      const btn = document.getElementById('ambu-gps-drop');
+      btn.textContent = '📡…'; btn.disabled = true;
+      navigator.geolocation.getCurrentPosition(p => {
+        document.getElementById('a-drop-lat').value = p.coords.latitude;
+        document.getElementById('a-drop-lng').value = p.coords.longitude;
+        document.getElementById('drop-coords-display').textContent =
+          `GPS: ${p.coords.latitude.toFixed(5)}, ${p.coords.longitude.toFixed(5)}`;
+        btn.textContent = '✓'; btn.disabled = false;
+        toast('Dropoff GPS captured', 'ok');
+      }, e => { toast('GPS: ' + e.message, 'err'); btn.textContent = '📡 GPS'; btn.disabled = false; },
+        { enableHighAccuracy: true });
+    });
+
+    // NEXT → fetch ambulances and move to step 2
+    document.getElementById('ambu-next').addEventListener('click', async () => {
+      const name = document.getElementById('a-name').value.trim();
+      const phone = document.getElementById('a-phone').value.trim();
+      const lat = parseFloat(document.getElementById('a-lat').value);
+      const lng = parseFloat(document.getElementById('a-lng').value);
+      const dropLat = parseFloat(document.getElementById('a-drop-lat').value);
+      const dropLng = parseFloat(document.getElementById('a-drop-lng').value);
+
+      if (!name || !phone) { toast('Enter name and phone number', 'err'); return; }
+      if (!lat || !lng) { toast('Set your pickup GPS location', 'err'); return; }
+
+      const nextBtn = document.getElementById('ambu-next');
+      nextBtn.textContent = 'SEARCHING…'; nextBtn.disabled = true;
+
+      try {
+        let url = `${API}/api/ambulances?lat=${lat}&lng=${lng}&n=6`;
+        if (dropLat && dropLng) {
+          url += `&drop_lat=${dropLat}&drop_lng=${dropLng}`;
+        }
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Backend error');
+        const data = await res.json();
+
+        const hasTrip = !!(dropLat && dropLng);
+        renderAmbuList(data.ambulances, lat, lng, hasTrip);
+
+        document.getElementById('ambu-step-gps').style.display = 'none';
+        document.getElementById('ambu-step-list').style.display = 'block';
+        document.getElementById('ambu-list-sub').textContent =
+          `${data.ambulances.length} units nearby · sorted by distance · tap to select`;
+      } catch (e) {
+        toast('Could not load ambulances: ' + e.message, 'err');
+      } finally {
+        nextBtn.textContent = 'FIND NEAREST UNITS →'; nextBtn.disabled = false;
+      }
+    });
+
+    function renderAmbuList(units, userLat, userLng, hasTrip) {
+      const container = document.getElementById('ambu-list-items');
+      container.innerHTML = '';
+      ambuSelected = null;
+      document.getElementById('ambu-confirm-summary').style.display = 'none';
+
+      if (!units.length) {
+        container.innerHTML = '<div class="ambu-err">No ambulances found near your location.</div>';
+        return;
+      }
+
+      units.forEach((u, i) => {
+        const typeIcon = u.type === 'ambulance' ? '🚑' : '🚐';
+        const typeLabel = u.type === 'ambulance' ? 'AMBULANCE' : 'MOBILE VAN';
+        const distText = u.distance_km >= 1
+          ? `${u.distance_km.toFixed(1)} km`
+          : `${u.distance_m} m`;
+
+        // ETA badge
+        const etaText = u.eta_min ? `~${u.eta_min} min` : '';
+        const tripInfo = hasTrip && u.trip_km
+          ? `<span class="stat-chip" style="color:var(--orange-b);border-color:rgba(255,167,38,.3)">🕐 Trip: ~${u.trip_eta_min} min (${u.trip_km} km)</span>`
+          : '';
+
+        const div = document.createElement('div');
+        div.className = 'ambu-option';
+        div.dataset.idx = i;
+        div.innerHTML = `
       <div class="ambu-radio"></div>
       <div class="ambu-opt-head">
         <div class="ambu-type-icon">${typeIcon}</div>
@@ -881,76 +1562,224 @@ function renderAmbuList(units, userLat, userLng){
       </div>
       <div class="ambu-opt-stats">
         <span class="stat-chip dist">📍 ${distText}</span>
+        <span class="stat-chip" style="color:var(--green-b);border-color:rgba(67,160,71,.3)">🕐 ETA ${etaText}</span>
         <span class="stat-chip cost">₹${u.cost_per_km}/km</span>
         <span class="stat-chip total">TOTAL ≈ ₹${u.total_cost.toFixed(0)}</span>
         <span class="stat-chip">Cap: ${u.capacity}</span>
+        ${tripInfo}
       </div>
       <div class="ambu-phone">📞 ${u.phone}</div>`;
 
-    div.addEventListener('click',()=>{
-      document.querySelectorAll('.ambu-option').forEach(el=>el.classList.remove('selected'));
-      div.classList.add('selected');
-      ambuSelected = u;
-      // Show summary
-      const summary = document.getElementById('ambu-confirm-summary');
-      summary.style.display = '';
-      summary.innerHTML = `
+        div.addEventListener('click', () => {
+          document.querySelectorAll('.ambu-option').forEach(el => el.classList.remove('selected'));
+          div.classList.add('selected');
+          ambuSelected = u;
+          // Show summary
+          const summary = document.getElementById('ambu-confirm-summary');
+          summary.style.display = '';
+          const tripLine = hasTrip && u.trip_km
+            ? `Trip distance: <span>${u.trip_km} km</span> &nbsp;·&nbsp; Trip ETA: <span>~${u.trip_eta_min} min</span><br>`
+            : '';
+          summary.innerHTML = `
         <b style="color:var(--blue-b)">${u.name}</b><br>
-        Distance: <span>${distText}</span> &nbsp;·&nbsp;
-        Rate: <span>₹${u.cost_per_km}/km</span><br>
-        Estimated total: <span>₹${u.total_cost.toFixed(0)}</span> &nbsp;·&nbsp;
-        Phone: <span>${u.phone}</span>`;
+        Arrives at pickup in: <span style="color:var(--green-b)">~${u.eta_min} min</span> &nbsp;·&nbsp;
+        Distance: <span>${distText}</span><br>
+        ${tripLine}
+        Rate: <span>₹${u.cost_per_km}/km</span> &nbsp;·&nbsp;
+        Estimated total: <span style="color:var(--blue-b);font-weight:600">₹${u.total_cost.toFixed(0)}</span><br>
+        Phone: <span>${u.phone}</span> &nbsp;·&nbsp;
+        Rating: <span style="color:#f9a825">${u.rating.toFixed(1)} ★</span>`;
+        });
+
+        container.appendChild(div);
+      });
+    }
+
+    // CONFIRM BOOKING + ROUTE
+    let ambuRouteLayer = null;
+    document.getElementById('ambu-confirm').addEventListener('click', async () => {
+      if (!ambuSelected) { toast('Please select an ambulance first', 'err'); return; }
+
+      const name = document.getElementById('a-name').value.trim();
+      const phone = document.getElementById('a-phone').value.trim();
+      const lat = parseFloat(document.getElementById('a-lat').value);
+      const lng = parseFloat(document.getElementById('a-lng').value);
+      const dropLat = parseFloat(document.getElementById('a-drop-lat').value);
+      const dropLng = parseFloat(document.getElementById('a-drop-lng').value);
+      const pickupLabel = document.getElementById('a-loc').value || 'Pickup';
+      const dropLabel = document.getElementById('a-drop').value || 'Dropoff';
+
+      const btn = document.getElementById('ambu-confirm');
+      btn.textContent = 'BOOKING…'; btn.disabled = true;
+
+      try {
+        await new Promise(r => setTimeout(r, 900));
+        closeAmbuModal();
+        toast(`🚑 ${ambuSelected.name} booked! ETA ~${ambuSelected.eta_min} min. Driver will call ${phone}.`, 'ok');
+
+        // Clear previous ambulance route
+        if (ambuRouteLayer) map.removeLayer(ambuRouteLayer);
+
+        // Ambulance base marker
+        L.marker([ambuSelected.lat, ambuSelected.lng],
+          { icon: mkIcon('#42a5f5', 14, '3px') })
+          .addTo(map)
+          .bindPopup(`<b>🚑 ${ambuSelected.name}</b><br>Dispatched for ${name}<br>📞 ${ambuSelected.phone}`);
+
+        // Pickup marker
+        L.marker([lat, lng], { icon: mkIcon('#43a047', 16) })
+          .addTo(map)
+          .bindPopup(`<b>📍 Pickup</b><br>${pickupLabel}`);
+
+        if (dropLat && dropLng) {
+          // Dropoff marker
+          L.marker([dropLat, dropLng], { icon: mkIcon('#e74c3c', 16) })
+            .addTo(map)
+            .bindPopup(`<b>📌 Dropoff</b><br>${dropLabel}`)
+            .openPopup();
+
+          // Draw route: ambulance → pickup → dropoff
+          const routePts = [
+            [ambuSelected.lat, ambuSelected.lng],
+            [lat, lng],
+            [dropLat, dropLng]
+          ];
+          ambuRouteLayer = L.polyline(routePts, {
+            color: '#42a5f5', weight: 3.5, opacity: .9,
+            dashArray: '8 5',
+          }).addTo(map);
+          map.fitBounds(ambuRouteLayer.getBounds(), { padding: [50, 50], duration: 1.4 });
+        } else {
+          // No dropoff — just zoom to ambulance → pickup
+          const routePts = [
+            [ambuSelected.lat, ambuSelected.lng],
+            [lat, lng]
+          ];
+          ambuRouteLayer = L.polyline(routePts, {
+            color: '#42a5f5', weight: 3.5, opacity: .9,
+            dashArray: '8 5',
+          }).addTo(map);
+          map.fitBounds(ambuRouteLayer.getBounds(), { padding: [50, 50], duration: 1.4 });
+        }
+      } catch (e) {
+        toast('Error: ' + e.message, 'err');
+      } finally {
+        btn.textContent = 'CONFIRM BOOKING →'; btn.disabled = false;
+      }
     });
 
-    container.appendChild(div);
-  });
-}
+    // ── Helpers ──────────────────────────────────────────────────────
+    function timeAgo(iso) {
+      const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+      if (diff < 60) return `${Math.floor(diff)}s ago`;
+      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+      return `${Math.floor(diff / 3600)}h ago`;
+    }
 
-// CONFIRM BOOKING
-document.getElementById('ambu-confirm').addEventListener('click', async ()=>{
-  if(!ambuSelected){ toast('Please select an ambulance first','err'); return; }
+    function toast(msg, type = 'ok') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = 'show ' + (type || '');
+      setTimeout(() => t.className = '', 3200);
+    }
 
-  const name  = document.getElementById('a-name').value.trim();
-  const phone = document.getElementById('a-phone').value.trim();
-  const lat   = parseFloat(document.getElementById('a-lat').value);
-  const lng   = parseFloat(document.getElementById('a-lng').value);
+    // ── Location Suggestions System ─────────────────────────────────
+    const MUMBAI_PLACES = [
+      { name: 'Dadar Station', area: 'Dadar', lat: 19.0189, lng: 72.8443 },
+      { name: 'Dadar T.T.', area: 'Dadar', lat: 19.0169, lng: 72.8465 },
+      { name: 'KEM Hospital', area: 'Parel', lat: 19.0002, lng: 72.8416 },
+      { name: 'Sion Hospital', area: 'Sion', lat: 19.0408, lng: 72.8626 },
+      { name: 'Lilavati Hospital', area: 'Bandra', lat: 19.0509, lng: 72.8290 },
+      { name: 'Hinduja Hospital', area: 'Mahim', lat: 19.0335, lng: 72.8425 },
+      { name: 'Nanavati Hospital', area: 'Vile Parle', lat: 19.0981, lng: 72.8402 },
+      { name: 'Jaslok Hospital', area: 'Breach Candy', lat: 18.9712, lng: 72.8054 },
+      { name: 'Bombay Hospital', area: 'Marine Lines', lat: 18.9427, lng: 72.8318 },
+      { name: 'Holy Family Hospital', area: 'Bandra', lat: 19.0545, lng: 72.8328 },
+      { name: 'Hiranandani Hospital', area: 'Powai', lat: 19.1185, lng: 72.9095 },
+      { name: 'Kokilaben Hospital', area: 'Andheri', lat: 19.1310, lng: 72.8258 },
+      { name: 'Wockhardt Hospital', area: 'Mira Road', lat: 19.2773, lng: 72.8720 },
+      { name: 'Bandra Station', area: 'Bandra', lat: 19.0544, lng: 72.8404 },
+      { name: 'Andheri Station', area: 'Andheri', lat: 19.1197, lng: 72.8464 },
+      { name: 'Borivali Station', area: 'Borivali', lat: 19.2286, lng: 72.8575 },
+      { name: 'Churchgate Station', area: 'Churchgate', lat: 18.9352, lng: 72.8268 },
+      { name: 'CST (VT) Station', area: 'Fort', lat: 18.9398, lng: 72.8355 },
+      { name: 'Mumbai Central Station', area: 'Mumbai Central', lat: 18.9698, lng: 72.8194 },
+      { name: 'Thane Station', area: 'Thane', lat: 19.1862, lng: 72.9756 },
+      { name: 'Kurla Station', area: 'Kurla', lat: 19.0652, lng: 72.8792 },
+      { name: 'Ghatkopar Station', area: 'Ghatkopar', lat: 19.0868, lng: 72.9084 },
+      { name: 'Vile Parle Station', area: 'Vile Parle', lat: 19.0991, lng: 72.8467 },
+      { name: 'Jogeshwari Station', area: 'Jogeshwari', lat: 19.1360, lng: 72.8490 },
+      { name: 'Malad Station', area: 'Malad', lat: 19.1857, lng: 72.8487 },
+      { name: 'Goregaon Station', area: 'Goregaon', lat: 19.1650, lng: 72.8497 },
+      { name: 'BKC', area: 'Bandra Kurla', lat: 19.0655, lng: 72.8601 },
+      { name: 'Powai Lake', area: 'Powai', lat: 19.1245, lng: 72.9070 },
+      { name: 'Juhu Beach', area: 'Juhu', lat: 19.0883, lng: 72.8263 },
+      { name: 'Gateway of India', area: 'Colaba', lat: 18.9220, lng: 72.8347 },
+      { name: 'Marine Drive', area: 'Marine Lines', lat: 18.9432, lng: 72.8235 },
+      { name: 'Haji Ali', area: 'Worli', lat: 18.9826, lng: 72.8089 },
+      { name: 'Worli Sea Link', area: 'Worli', lat: 19.0176, lng: 72.8150 },
+      { name: 'Phoenix Mall, Lower Parel', area: 'Lower Parel', lat: 18.9934, lng: 72.8268 },
+      { name: 'Siddhivinayak Temple', area: 'Prabhadevi', lat: 19.0167, lng: 72.8302 },
+      { name: 'CSMT Area', area: 'Fort', lat: 18.9400, lng: 72.8360 },
+      { name: 'Mulund Station', area: 'Mulund', lat: 19.1710, lng: 72.9503 },
+      { name: 'Bhandup Station', area: 'Bhandup', lat: 19.1488, lng: 72.9376 },
+      { name: 'Vikhroli Station', area: 'Vikhroli', lat: 19.1105, lng: 72.9246 },
+      { name: 'Chembur Station', area: 'Chembur', lat: 19.0622, lng: 72.8979 },
+      { name: 'Wadala', area: 'Wadala', lat: 19.0176, lng: 72.8571 },
+      { name: 'Matunga Station', area: 'Matunga', lat: 19.0279, lng: 72.8456 },
+      { name: 'Nair Hospital', area: 'Mumbai Central', lat: 18.9810, lng: 72.8243 },
+      { name: 'JJ Hospital', area: 'Byculla', lat: 18.9640, lng: 72.8340 },
+      { name: 'Breach Candy Hospital', area: 'Breach Candy', lat: 18.9734, lng: 72.8029 },
+    ];
 
-  const btn = document.getElementById('ambu-confirm');
-  btn.textContent = 'BOOKING…'; btn.disabled = true;
+    function setupSuggestions(inputId, suggestId, latId, lngId, coordsDisplayId) {
+      const input = document.getElementById(inputId);
+      const sugBox = document.getElementById(suggestId);
 
-  try{
-    // Simulate API call (replace with real endpoint if available)
-    await new Promise(r=>setTimeout(r, 900));
-    closeAmbuModal();
-    toast(`🚑 ${ambuSelected.name} booked! Driver will call ${phone} shortly.`,'ok');
+      input.addEventListener('input', () => {
+        const q = input.value.toLowerCase().trim();
+        if (q.length < 2) { sugBox.classList.remove('open'); sugBox.innerHTML = ''; return; }
 
-    // Drop a marker on the map for the ambulance unit
-    L.marker([ambuSelected.lat, ambuSelected.lng],
-      {icon: mkIcon('#42a5f5', 14, '3px')})
-      .addTo(map)
-      .bindPopup(`<b>${ambuSelected.name}</b><br>Dispatched for ${name}<br>📞 ${ambuSelected.phone}`)
-      .openPopup();
-    map.flyTo([ambuSelected.lat, ambuSelected.lng], 13, {duration:1.4});
-  }catch(e){
-    toast('Error: '+e.message,'err');
-  }finally{
-    btn.textContent = 'CONFIRM BOOKING →'; btn.disabled = false;
-  }
-});
+        const matches = MUMBAI_PLACES.filter(p =>
+          p.name.toLowerCase().includes(q) || p.area.toLowerCase().includes(q)
+        ).slice(0, 6);
 
-// ── Helpers ──────────────────────────────────────────────────────
-function timeAgo(iso){
-  const diff = (Date.now() - new Date(iso).getTime()) / 1000;
-  if(diff < 60) return `${Math.floor(diff)}s ago`;
-  if(diff < 3600) return `${Math.floor(diff/60)}m ago`;
-  return `${Math.floor(diff/3600)}h ago`;
-}
+        if (!matches.length) { sugBox.classList.remove('open'); sugBox.innerHTML = ''; return; }
 
-function toast(msg, type='ok'){
-  const t = document.getElementById('toast');
-  t.textContent=msg; t.className='show '+(type||'');
-  setTimeout(()=>t.className='',3200);
-}
-</script>
+        sugBox.innerHTML = matches.map((p, i) => `
+      <div class="loc-suggest-item" data-idx="${i}">
+        <span class="sug-icon">📍</span>
+        <span>${p.name}</span>
+        <span class="sug-area">${p.area}</span>
+      </div>
+    `).join('');
+        sugBox.classList.add('open');
+
+        sugBox.querySelectorAll('.loc-suggest-item').forEach((el, i) => {
+          el.addEventListener('click', () => {
+            const place = matches[i];
+            input.value = place.name;
+            document.getElementById(latId).value = place.lat;
+            document.getElementById(lngId).value = place.lng;
+            document.getElementById(coordsDisplayId).textContent =
+              `${place.area} · ${place.lat.toFixed(5)}, ${place.lng.toFixed(5)}`;
+            sugBox.classList.remove('open');
+            sugBox.innerHTML = '';
+          });
+        });
+      });
+
+      // Close suggestions when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !sugBox.contains(e.target)) {
+          sugBox.classList.remove('open');
+        }
+      });
+    }
+
+    // Attach suggestions to both pickup and dropoff
+    setupSuggestions('a-loc', 'pickup-suggest', 'a-lat', 'a-lng', 'pickup-coords-display');
+    setupSuggestions('a-drop', 'drop-suggest', 'a-drop-lat', 'a-drop-lng', 'drop-coords-display');
+  </script>
 </body>
+
 </html>

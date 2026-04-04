@@ -208,6 +208,36 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--b
   background:#1565c0;border:1.5px solid rgba(100,181,246,.5);
   box-shadow:0 0 4px rgba(21,101,192,.6);
 }
+
+/* ── profile avatar icon ── */
+.profile-avatar-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:50%;
+  border:1.5px solid var(--border);background:var(--panel2);
+  cursor:pointer;transition:border-color .25s, box-shadow .25s, transform .2s;
+  text-decoration:none;flex-shrink:0;
+}
+.profile-avatar-btn:hover{
+  border-color:var(--red-bright);
+  box-shadow:0 0 0 3px var(--red-glow), 0 0 16px rgba(231,76,60,.25);
+  transform:scale(1.1);
+}
+.profile-avatar-btn:active{transform:scale(.95)}
+
+.nav-pill{
+  font-family:var(--mono);font-size:.6rem;color:var(--muted);
+  text-decoration:none;letter-spacing:1px;
+  border:1px solid var(--border);padding:5px 10px;border-radius:2px;
+  transition:.2s;display:flex;align-items:center;gap:4px;
+}
+.nav-pill:hover{border-color:var(--red-dim);color:var(--text)}
+
+.sidebar-head-top{
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sidebar-head-nav{
+  display:flex;align-items:center;gap:8px;
+}
 </style>
 </head>
 <body>
@@ -216,7 +246,19 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--b
 <!-- ── SIDEBAR ── -->
 <div id="sidebar">
   <div class="sidebar-head">
-    <div class="logo"><span class="logo-drop"></span>RakhtSetu</div>
+    <div class="sidebar-head-top">
+      <div class="logo"><span class="logo-drop"></span>RakhtSetu</div>
+      <div class="sidebar-head-nav">
+        <a href="dashboard.html" class="nav-pill">← LIVE FEED</a>
+        <a href="profile.html" class="profile-avatar-btn" id="profile-btn" title="View your donor profile">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+            <circle cx="18" cy="18" r="17" stroke="#e74c3c" stroke-width="1.5" fill="rgba(192,57,43,.15)"/>
+            <circle cx="18" cy="14" r="5.5" fill="rgba(192,57,43,.35)" stroke="#c0392b" stroke-width="1"/>
+            <path d="M7 32c0-6.075 4.925-11 11-11s11 4.925 11 11" stroke="#c0392b" stroke-width="1.2" stroke-linecap="round" fill="rgba(192,57,43,.12)"/>
+          </svg>
+        </a>
+      </div>
+    </div>
     <div class="tagline">MUMBAI BLOOD GRID · REQUEST NODE</div>
   </div>
 
