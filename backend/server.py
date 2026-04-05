@@ -37,7 +37,7 @@ from cryptography.fernet import Fernet
 from flask import Flask, Response, jsonify, request, stream_with_context
 from flask_cors import CORS
 
-from data_loader import (
+from backend.data_loader import (
     astar_route,
     load_ambulances,
     load_blood_banks,
@@ -569,6 +569,6 @@ def _seed_demo():
 
 if __name__ == "__main__":
     _seed_demo()
-    print("🩸 RakhtSetu server running → http://localhost:5000")
+    print("🩸 RakhtSetu server running → https://rakhtsetu-1.onrender.com")
     print(f"   Fernet key (save this): {_FERNET_KEY}")
     app.run(debug=True, threaded=True, port=5000)
