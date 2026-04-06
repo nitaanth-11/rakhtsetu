@@ -885,9 +885,10 @@
           <a href="index.html" class="nav-link">+ REQUEST</a>
           <a href="profile.html" class="profile-avatar-btn" id="profile-btn" title="View your donor profile">
             <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
-              <circle cx="18" cy="18" r="17" stroke="#e74c3c" stroke-width="1.5" fill="rgba(192,57,43,.15)"/>
-              <circle cx="18" cy="14" r="5.5" fill="rgba(192,57,43,.35)" stroke="#c0392b" stroke-width="1"/>
-              <path d="M7 32c0-6.075 4.925-11 11-11s11 4.925 11 11" stroke="#c0392b" stroke-width="1.2" stroke-linecap="round" fill="rgba(192,57,43,.12)"/>
+              <circle cx="18" cy="18" r="17" stroke="#e74c3c" stroke-width="1.5" fill="rgba(192,57,43,.15)" />
+              <circle cx="18" cy="14" r="5.5" fill="rgba(192,57,43,.35)" stroke="#c0392b" stroke-width="1" />
+              <path d="M7 32c0-6.075 4.925-11 11-11s11 4.925 11 11" stroke="#c0392b" stroke-width="1.2"
+                stroke-linecap="round" fill="rgba(192,57,43,.12)" />
             </svg>
           </a>
         </div>
@@ -906,7 +907,7 @@
       <div id="feed">
         <div class="feed-empty" id="feed-empty">
           WAITING FOR REQUESTS…<br>
-          <span style="font-size:.7rem">Connect to backend at localhost:5000</span>
+          <span style="font-size:.7rem">Live Network Connected</span>
         </div>
       </div>
     </div>
@@ -1053,7 +1054,7 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const API = "https://rakhtsetu-1.onrender.com";
+    const API = ""; // Use relative URLs for seamless local/production deployment
 
     // ── Auth guard: must be registered ──────────────────────────────
     const donor = JSON.parse(localStorage.getItem('donor') || 'null');
@@ -1783,4 +1784,3 @@
 </body>
 
 </html>
-

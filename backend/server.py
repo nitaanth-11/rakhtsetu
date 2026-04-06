@@ -562,13 +562,14 @@ def _seed_demo():
             "room_id":       req_id,
         }
 
+# Seed demo data in all environments (including production)
+_seed_demo()
 
 # ─────────────────────────────────────────────────────────────────
 #  Run
 # ─────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    _seed_demo()
     print("🩸 RakhtSetu server running → https://rakhtsetu-1.onrender.com")
     print(f"   Fernet key (save this): {_FERNET_KEY}")
     app.run(debug=True, threaded=True, port=5000)

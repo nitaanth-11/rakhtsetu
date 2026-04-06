@@ -9,6 +9,7 @@ import csv
 import os
 import math
 from typing import List, Dict, Tuple, Optional
+from functools import lru_cache
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -27,6 +28,7 @@ AMBULANCES_CSV = next((p for p in _ambu_candidates if os.path.exists(p)), _ambu_
 #  CSV Loaders
 # ─────────────────────────────────────────────────────────────────
 
+@lru_cache(maxsize=1)
 def load_blood_banks() -> List[Dict]:
     """Return list of blood bank dicts from CSV."""
     banks = []
@@ -44,6 +46,7 @@ def load_blood_banks() -> List[Dict]:
     return banks
 
 
+@lru_cache(maxsize=1)
 def load_ambulances() -> List[Dict]:
     """Return list of ambulance / mobile-van dicts from CSV."""
     units = []
@@ -131,6 +134,7 @@ LAT_RANGE = (18.89, 19.27)
 LNG_RANGE = (72.79, 72.97)
 
 
+@lru_cache(maxsize=1)
 def _build_node_list() -> List[Tuple[float, float]]:
     """Combine blood bank coords with a uniform grid."""
     nodes: List[Tuple[float, float]] = []

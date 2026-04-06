@@ -1,470 +1,745 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RakhtSetu · Secure Chat</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<style>
-:root{
-  --red:#c0392b;--red-b:#e74c3c;--red-d:#7b1c1c;
-  --red-glow:rgba(192,57,43,.35);
-  --bg:#080b0e;--panel:#0e1318;--panel2:#141b22;--panel3:#1a232e;
-  --border:#1e2a35;--text:#d4dde8;--muted:#566879;
-  --green:#1b5e20;--green-b:#43a047;--green-dim:#0a2310;
-  --blue-b:#42a5f5;
-  --mono:'Share Tech Mono',monospace;
-  --head:'Rajdhani',sans-serif;
-  --body:'Inter',sans-serif;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--body);overflow:hidden}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RakhtSetu · Secure Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    :root {
+      --red: #c0392b;
+      --red-b: #e74c3c;
+      --red-d: #7b1c1c;
+      --red-glow: rgba(192, 57, 43, .35);
+      --bg: #080b0e;
+      --panel: #0e1318;
+      --panel2: #141b22;
+      --panel3: #1a232e;
+      --border: #1e2a35;
+      --text: #d4dde8;
+      --muted: #566879;
+      --green: #1b5e20;
+      --green-b: #43a047;
+      --green-dim: #0a2310;
+      --blue-b: #42a5f5;
+      --mono: 'Share Tech Mono', monospace;
+      --head: 'Rajdhani', sans-serif;
+      --body: 'Inter', sans-serif;
+    }
 
-.shell{display:flex;height:100vh}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
 
-/* ── LEFT: CHAT ── */
-#chat-panel{
-  width:400px;min-width:400px;
-  display:flex;flex-direction:column;
-  background:var(--panel);border-right:1px solid var(--border);
-}
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      overflow: hidden
+    }
 
-.chat-head{
-  padding:16px 20px;border-bottom:1px solid var(--border);
-  background:linear-gradient(135deg,#0c1219,#101820);
-  flex-shrink:0;
-}
-.chat-logo{
-  font-family:var(--head);font-size:1.2rem;font-weight:700;
-  color:var(--red-b);letter-spacing:3px;display:flex;align-items:center;gap:10px;
-}
-.secure-badge{
-  font-family:var(--mono);font-size:.55rem;letter-spacing:2px;
-  background:rgba(27,94,32,.3);border:1px solid var(--green);
-  color:var(--green-b);padding:3px 8px;border-radius:2px;
-}
-.room-info{
-  font-family:var(--mono);font-size:.65rem;color:var(--muted);
-  margin-top:6px;display:flex;gap:16px;
-}
-.room-info span{color:var(--text)}
+    .shell {
+      display: flex;
+      height: 100vh
+    }
 
-/* lock banner */
-.lock-banner{
-  margin:12px 16px;padding:10px 14px;
-  background:rgba(27,94,32,.15);border:1px solid var(--green);
-  border-radius:3px;font-family:var(--mono);font-size:.68rem;
-  color:var(--green-b);line-height:1.6;display:flex;gap:10px;align-items:flex-start;
-}
-.lock-icon{font-size:1rem;flex-shrink:0}
+    /* ── LEFT: CHAT ── */
+    #chat-panel {
+      width: 400px;
+      min-width: 400px;
+      display: flex;
+      flex-direction: column;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+    }
 
-/* status bar */
-#status-bar{
-  padding:8px 16px;background:var(--panel2);border-bottom:1px solid var(--border);
-  font-family:var(--mono);font-size:.65rem;color:var(--muted);
-  display:flex;align-items:center;gap:8px;flex-shrink:0;
-}
-.status-dot{
-  width:6px;height:6px;border-radius:50%;background:var(--green-b);
-  animation:pulse 2s infinite;flex-shrink:0;
-}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .chat-head {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, #0c1219, #101820);
+      flex-shrink: 0;
+    }
 
-/* messages */
-#messages{
-  flex:1;overflow-y:auto;padding:14px 16px;
-  display:flex;flex-direction:column;gap:10px;
-}
-#messages::-webkit-scrollbar{width:3px}
-#messages::-webkit-scrollbar-thumb{background:var(--red-d);border-radius:2px}
+    .chat-logo {
+      font-family: var(--head);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--red-b);
+      letter-spacing: 3px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-.msg-wrap{display:flex;flex-direction:column;max-width:88%}
-.msg-wrap.donor{align-self:flex-end;align-items:flex-end}
-.msg-wrap.recipient{align-self:flex-start;align-items:flex-start}
-.msg-wrap.system{align-self:center;align-items:center;max-width:100%}
+    .secure-badge {
+      font-family: var(--mono);
+      font-size: .55rem;
+      letter-spacing: 2px;
+      background: rgba(27, 94, 32, .3);
+      border: 1px solid var(--green);
+      color: var(--green-b);
+      padding: 3px 8px;
+      border-radius: 2px;
+    }
 
-.msg-bubble{
-  padding:9px 13px;border-radius:4px;
-  font-size:.85rem;line-height:1.5;
-  animation:fadeUp .25s ease;
-}
-@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    .room-info {
+      font-family: var(--mono);
+      font-size: .65rem;
+      color: var(--muted);
+      margin-top: 6px;
+      display: flex;
+      gap: 16px;
+    }
 
-.msg-wrap.donor   .msg-bubble{background:var(--red-d);border:1px solid var(--red);color:#f0d0d0}
-.msg-wrap.recipient .msg-bubble{background:var(--panel3);border:1px solid var(--border);color:var(--text)}
-.msg-wrap.system  .msg-bubble{
-  background:var(--green-dim);border:1px solid var(--green);
-  color:var(--green-b);font-family:var(--mono);font-size:.7rem;
-  letter-spacing:.5px;text-align:center;max-width:100%;border-radius:2px;
-}
+    .room-info span {
+      color: var(--text)
+    }
 
-.msg-meta{
-  font-family:var(--mono);font-size:.58rem;color:var(--muted);margin-top:3px;
-}
+    /* lock banner */
+    .lock-banner {
+      margin: 12px 16px;
+      padding: 10px 14px;
+      background: rgba(27, 94, 32, .15);
+      border: 1px solid var(--green);
+      border-radius: 3px;
+      font-family: var(--mono);
+      font-size: .68rem;
+      color: var(--green-b);
+      line-height: 1.6;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
 
-/* input area */
-.chat-input-area{
-  padding:14px 16px;border-top:1px solid var(--border);flex-shrink:0;
-}
-.input-row{display:flex;gap:10px}
-#chat-input{
-  flex:1;padding:11px 14px;background:var(--panel2);
-  border:1px solid var(--border);color:var(--text);
-  border-radius:3px;font-family:var(--body);font-size:.88rem;
-  transition:border-color .2s;
-}
-#chat-input:focus{outline:none;border-color:var(--red-d)}
-#chat-input::placeholder{color:var(--muted)}
-.send-btn{
-  padding:11px 18px;background:var(--red);border:none;color:#fff;
-  border-radius:3px;cursor:pointer;font-family:var(--mono);font-size:.7rem;
-  letter-spacing:1px;transition:.2s;
-}
-.send-btn:hover{background:var(--red-b)}
-.send-btn:disabled{opacity:.4;cursor:default}
+    .lock-icon {
+      font-size: 1rem;
+      flex-shrink: 0
+    }
 
-/* route info */
-#route-info{
-  display:none;padding:12px 16px;
-  background:rgba(192,57,43,.08);border-top:1px solid var(--red-d);flex-shrink:0;
-}
-.route-row{
-  display:flex;justify-content:space-between;
-  font-family:var(--mono);font-size:.68rem;
-  color:var(--muted);margin-bottom:4px;
-}
-.route-row span{color:var(--text)}
-.route-row span.red{color:var(--red-b)}
+    /* status bar */
+    #status-bar {
+      padding: 8px 16px;
+      background: var(--panel2);
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: .65rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
 
-/* ── RIGHT: MAP ── */
-#map-area{flex:1;position:relative}
-#map{width:100%;height:100%}
-.leaflet-tile-pane{filter:brightness(.5) saturate(.4) hue-rotate(190deg)}
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green-b);
+      animation: pulse 2s infinite;
+      flex-shrink: 0;
+    }
 
-/* map overlay */
-.map-overlay{
-  position:absolute;top:16px;left:16px;z-index:800;
-  background:rgba(14,19,24,.9);border:1px solid var(--border);
-  border-radius:4px;padding:14px 18px;backdrop-filter:blur(6px);
-  font-family:var(--mono);font-size:.68rem;
-  max-width:260px;
-}
-.overlay-title{color:var(--red-b);font-size:.75rem;letter-spacing:2px;margin-bottom:8px}
-.overlay-item{color:var(--muted);margin-bottom:4px;line-height:1.5}
-.overlay-item b{color:var(--text)}
+    @keyframes pulse {
 
-/* route pending */
-#route-pending{
-  position:absolute;inset:0;z-index:700;
-  background:rgba(8,11,14,.85);backdrop-filter:blur(6px);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:16px;
-}
-.spinner{
-  width:48px;height:48px;border:3px solid var(--border);
-  border-top-color:var(--red);border-radius:50%;
-  animation:spin .9s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-.pending-text{font-family:var(--mono);font-size:.75rem;color:var(--muted);letter-spacing:2px}
+      0%,
+      100% {
+        opacity: 1
+      }
 
-/* nav links */
-.nav-link:hover{border-color:var(--red-d) !important;color:var(--text) !important}
+      50% {
+        opacity: .4
+      }
+    }
 
-/* toast */
-#toast{
-  position:fixed;bottom:24px;right:24px;
-  background:var(--panel2);border:1px solid var(--border);
-  padding:12px 20px;border-radius:3px;
-  font-family:var(--mono);font-size:.75rem;
-  opacity:0;transition:.35s;z-index:9999;pointer-events:none;
-  transform:translateY(10px);
-}
-#toast.show{opacity:1;transform:translateY(0)}
-#toast.ok{border-color:var(--green);color:var(--green-b)}
-#toast.err{border-color:var(--red-d);color:var(--red-b)}
-</style>
+    /* messages */
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #messages::-webkit-scrollbar {
+      width: 3px
+    }
+
+    #messages::-webkit-scrollbar-thumb {
+      background: var(--red-d);
+      border-radius: 2px
+    }
+
+    .msg-wrap {
+      display: flex;
+      flex-direction: column;
+      max-width: 88%
+    }
+
+    .msg-wrap.donor {
+      align-self: flex-end;
+      align-items: flex-end
+    }
+
+    .msg-wrap.recipient {
+      align-self: flex-start;
+      align-items: flex-start
+    }
+
+    .msg-wrap.system {
+      align-self: center;
+      align-items: center;
+      max-width: 100%
+    }
+
+    .msg-bubble {
+      padding: 9px 13px;
+      border-radius: 4px;
+      font-size: .85rem;
+      line-height: 1.5;
+      animation: fadeUp .25s ease;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(6px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .msg-wrap.donor .msg-bubble {
+      background: var(--red-d);
+      border: 1px solid var(--red);
+      color: #f0d0d0
+    }
+
+    .msg-wrap.recipient .msg-bubble {
+      background: var(--panel3);
+      border: 1px solid var(--border);
+      color: var(--text)
+    }
+
+    .msg-wrap.system .msg-bubble {
+      background: var(--green-dim);
+      border: 1px solid var(--green);
+      color: var(--green-b);
+      font-family: var(--mono);
+      font-size: .7rem;
+      letter-spacing: .5px;
+      text-align: center;
+      max-width: 100%;
+      border-radius: 2px;
+    }
+
+    .msg-meta {
+      font-family: var(--mono);
+      font-size: .58rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* input area */
+    .chat-input-area {
+      padding: 14px 16px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px
+    }
+
+    #chat-input {
+      flex: 1;
+      padding: 11px 14px;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 3px;
+      font-family: var(--body);
+      font-size: .88rem;
+      transition: border-color .2s;
+    }
+
+    #chat-input:focus {
+      outline: none;
+      border-color: var(--red-d)
+    }
+
+    #chat-input::placeholder {
+      color: var(--muted)
+    }
+
+    .send-btn {
+      padding: 11px 18px;
+      background: var(--red);
+      border: none;
+      color: #fff;
+      border-radius: 3px;
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: .7rem;
+      letter-spacing: 1px;
+      transition: .2s;
+    }
+
+    .send-btn:hover {
+      background: var(--red-b)
+    }
+
+    .send-btn:disabled {
+      opacity: .4;
+      cursor: default
+    }
+
+    /* route info */
+    #route-info {
+      display: none;
+      padding: 12px 16px;
+      background: rgba(192, 57, 43, .08);
+      border-top: 1px solid var(--red-d);
+      flex-shrink: 0;
+    }
+
+    .route-row {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: .68rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .route-row span {
+      color: var(--text)
+    }
+
+    .route-row span.red {
+      color: var(--red-b)
+    }
+
+    /* ── RIGHT: MAP ── */
+    #map-area {
+      flex: 1;
+      position: relative
+    }
+
+    #map {
+      width: 100%;
+      height: 100%
+    }
+
+    .leaflet-tile-pane {
+      filter: brightness(.5) saturate(.4) hue-rotate(190deg)
+    }
+
+    /* map overlay */
+    .map-overlay {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 800;
+      background: rgba(14, 19, 24, .9);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 14px 18px;
+      backdrop-filter: blur(6px);
+      font-family: var(--mono);
+      font-size: .68rem;
+      max-width: 260px;
+    }
+
+    .overlay-title {
+      color: var(--red-b);
+      font-size: .75rem;
+      letter-spacing: 2px;
+      margin-bottom: 8px
+    }
+
+    .overlay-item {
+      color: var(--muted);
+      margin-bottom: 4px;
+      line-height: 1.5
+    }
+
+    .overlay-item b {
+      color: var(--text)
+    }
+
+    /* route pending */
+    #route-pending {
+      position: absolute;
+      inset: 0;
+      z-index: 700;
+      background: rgba(8, 11, 14, .85);
+      backdrop-filter: blur(6px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin .9s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .pending-text {
+      font-family: var(--mono);
+      font-size: .75rem;
+      color: var(--muted);
+      letter-spacing: 2px
+    }
+
+    /* nav links */
+    .nav-link:hover {
+      border-color: var(--red-d) !important;
+      color: var(--text) !important
+    }
+
+    /* toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      padding: 12px 20px;
+      border-radius: 3px;
+      font-family: var(--mono);
+      font-size: .75rem;
+      opacity: 0;
+      transition: .35s;
+      z-index: 9999;
+      pointer-events: none;
+      transform: translateY(10px);
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    #toast.ok {
+      border-color: var(--green);
+      color: var(--green-b)
+    }
+
+    #toast.err {
+      border-color: var(--red-d);
+      color: var(--red-b)
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="shell">
+  <div class="shell">
 
-<!-- ── CHAT PANEL ── -->
-<div id="chat-panel">
+    <!-- ── CHAT PANEL ── -->
+    <div id="chat-panel">
 
-  <div class="chat-head">
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <div class="chat-logo">
-        RAKHTSETU
-        <span class="secure-badge">🔒 E2E ENCRYPTED</span>
+      <div class="chat-head">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="chat-logo">
+            RAKHTSETU
+            <span class="secure-badge">🔒 E2E ENCRYPTED</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <a href="dashboard.html" class="nav-link"
+              style="font-family:var(--mono);font-size:.6rem;color:var(--muted);text-decoration:none;letter-spacing:1px;border:1px solid var(--border);padding:5px 10px;border-radius:2px;transition:.2s">←
+              DASHBOARD</a>
+            <a href="profile.html" class="nav-link"
+              style="font-family:var(--mono);font-size:.6rem;color:var(--muted);text-decoration:none;letter-spacing:1px;border:1px solid var(--border);padding:5px 10px;border-radius:2px;transition:.2s">👤
+              PROFILE</a>
+          </div>
+        </div>
+        <div class="room-info">
+          ROOM <span id="h-room">—</span>
+          &nbsp;·&nbsp;
+          ROLE <span id="h-role">—</span>
+        </div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <a href="dashboard.html" class="nav-link" style="font-family:var(--mono);font-size:.6rem;color:var(--muted);text-decoration:none;letter-spacing:1px;border:1px solid var(--border);padding:5px 10px;border-radius:2px;transition:.2s">← DASHBOARD</a>
-        <a href="profile.html" class="nav-link" style="font-family:var(--mono);font-size:.6rem;color:var(--muted);text-decoration:none;letter-spacing:1px;border:1px solid var(--border);padding:5px 10px;border-radius:2px;transition:.2s">👤 PROFILE</a>
+
+      <div class="lock-banner">
+        <span class="lock-icon">🔐</span>
+        <span>
+          Location is <b>encrypted</b> and hidden until the donor connects.
+          Once connected, A* route is revealed — coordinates remain protected in transit.
+        </span>
+      </div>
+
+      <div id="status-bar">
+        <div class="status-dot"></div>
+        <span id="status-text">Connecting to room…</span>
+      </div>
+
+      <div id="messages"></div>
+
+      <!-- Route summary strip (shown after connect) -->
+      <div id="route-info">
+        <div class="route-row">ROUTE DISTANCE <span class="red" id="ri-dist">—</span></div>
+        <div class="route-row">WAYPOINTS <span id="ri-hops">—</span></div>
+        <div class="route-row">ALGORITHM <span>A* GRID (Mumbai)</span></div>
+      </div>
+
+      <div class="chat-input-area">
+        <div class="input-row">
+          <input type="text" id="chat-input" placeholder="Type a message…" maxlength="500">
+          <button class="send-btn" id="send-btn">SEND</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── MAP ── -->
+    <div id="map-area">
+      <div id="map"></div>
+
+      <!-- shown while waiting for route -->
+      <div id="route-pending" style="display:none">
+        <div class="spinner"></div>
+        <div class="pending-text">AWAITING DONOR CONNECTION…</div>
+        <div class="pending-text" style="font-size:.6rem;opacity:.5">
+          Route will be revealed when donor connects
+        </div>
+      </div>
+
+      <!-- map info card (shown after route loads) -->
+      <div class="map-overlay" id="map-card" style="display:none">
+        <div class="overlay-title">A* ROUTE ACTIVE</div>
+        <div class="overlay-item">DONOR → <b id="mc-donor">—</b></div>
+        <div class="overlay-item">RECIPIENT → <b id="mc-recip">—</b></div>
+        <div class="overlay-item">DISTANCE → <b class="red" id="mc-dist">—</b></div>
       </div>
     </div>
-    <div class="room-info">
-      ROOM <span id="h-room">—</span>
-      &nbsp;·&nbsp;
-      ROLE <span id="h-role">—</span>
-    </div>
-  </div>
 
-  <div class="lock-banner">
-    <span class="lock-icon">🔐</span>
-    <span>
-      Location is <b>encrypted</b> and hidden until the donor connects.
-      Once connected, A* route is revealed — coordinates remain protected in transit.
-    </span>
-  </div>
+  </div><!-- shell -->
+  <div id="toast"></div>
 
-  <div id="status-bar">
-    <div class="status-dot"></div>
-    <span id="status-text">Connecting to room…</span>
-  </div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const API = ""; // Use relative URLs for seamless local/production deployment
 
-  <div id="messages"></div>
+    // ── Parse URL params ─────────────────────────────────────────────
+    const params = new URLSearchParams(location.search);
+    const ROOM = params.get('room') || '';
+    const ROLE = params.get('role') || 'donor';    // 'donor' | 'recipient'
+    const NAME = params.get('name') || (ROLE === 'donor' ? 'Donor' : 'Recipient');
 
-  <!-- Route summary strip (shown after connect) -->
-  <div id="route-info">
-    <div class="route-row">ROUTE DISTANCE <span class="red" id="ri-dist">—</span></div>
-    <div class="route-row">WAYPOINTS <span id="ri-hops">—</span></div>
-    <div class="route-row">ALGORITHM <span>A* GRID (Mumbai)</span></div>
-  </div>
+    document.getElementById('h-room').textContent = ROOM || '—';
+    document.getElementById('h-role').textContent = ROLE.toUpperCase();
+    document.title = `RakhtSetu · ${ROOM}`;
 
-  <div class="chat-input-area">
-    <div class="input-row">
-      <input type="text" id="chat-input" placeholder="Type a message…" maxlength="500">
-      <button class="send-btn" id="send-btn">SEND</button>
-    </div>
-  </div>
+    // ── Map ──────────────────────────────────────────────────────────
+    const map = L.map('map', { zoomControl: false }).setView([19.076, 72.877], 12);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      { attribution: '© OpenStreetMap' }).addTo(map);
 
-</div>
-
-<!-- ── MAP ── -->
-<div id="map-area">
-  <div id="map"></div>
-
-  <!-- shown while waiting for route -->
-  <div id="route-pending" style="display:none">
-    <div class="spinner"></div>
-    <div class="pending-text">AWAITING DONOR CONNECTION…</div>
-    <div class="pending-text" style="font-size:.6rem;opacity:.5">
-      Route will be revealed when donor connects
-    </div>
-  </div>
-
-  <!-- map info card (shown after route loads) -->
-  <div class="map-overlay" id="map-card" style="display:none">
-    <div class="overlay-title">A* ROUTE ACTIVE</div>
-    <div class="overlay-item">DONOR → <b id="mc-donor">—</b></div>
-    <div class="overlay-item">RECIPIENT → <b id="mc-recip">—</b></div>
-    <div class="overlay-item">DISTANCE → <b class="red" id="mc-dist">—</b></div>
-  </div>
-</div>
-
-</div><!-- shell -->
-<div id="toast"></div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-const API = "https://rakhtsetu-1.onrender.com";
-
-// ── Parse URL params ─────────────────────────────────────────────
-const params = new URLSearchParams(location.search);
-const ROOM   = params.get('room') || '';
-const ROLE   = params.get('role') || 'donor';    // 'donor' | 'recipient'
-const NAME   = params.get('name') || (ROLE === 'donor' ? 'Donor' : 'Recipient');
-
-document.getElementById('h-room').textContent = ROOM || '—';
-document.getElementById('h-role').textContent = ROLE.toUpperCase();
-document.title = `RakhtSetu · ${ROOM}`;
-
-// ── Map ──────────────────────────────────────────────────────────
-const map = L.map('map',{zoomControl:false}).setView([19.076,72.877],12);
-L.control.zoom({position:'bottomright'}).addTo(map);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  {attribution:'© OpenStreetMap'}).addTo(map);
-
-const mkIcon = (color,size=14,radius='50%') => L.divIcon({
-  className:'',
-  html:`<div style="width:${size}px;height:${size}px;background:${color};
+    const mkIcon = (color, size = 14, radius = '50%') => L.divIcon({
+      className: '',
+      html: `<div style="width:${size}px;height:${size}px;background:${color};
         border-radius:${radius};border:2px solid rgba(255,255,255,.4);
         box-shadow:0 0 8px ${color}88"></div>`,
-  iconSize:[size,size]
-});
+      iconSize: [size, size]
+    });
 
-let routeLayer = null;
+    let routeLayer = null;
 
-// ── Show pending overlay (recipient side) ────────────────────────
-if(ROLE === 'recipient'){
-  document.getElementById('route-pending').style.display = 'flex';
-}
-
-// ── Chat SSE ─────────────────────────────────────────────────────
-function connectChat(){
-  if(!ROOM){ setStatus('No room ID in URL'); return; }
-  const es = new EventSource(`${API}/api/stream/chat/${ROOM}`);
-  es.onmessage = e => {
-    const msg = JSON.parse(e.data);
-    if(msg.event === 'connected'){
-      setStatus('Connected · Room ' + ROOM);
-    } else if(msg.event === 'message'){
-      renderMsg(msg.data);
-    } else if(msg.event === 'system'){
-      renderSystem(msg.msg);
-      // Attempt to load route now
-      loadRoute();
+    // ── Show pending overlay (recipient side) ────────────────────────
+    if (ROLE === 'recipient') {
+      document.getElementById('route-pending').style.display = 'flex';
     }
-  };
-  es.onerror = () => {
-    setStatus('Reconnecting…');
-    setTimeout(connectChat, 3000);
-  };
-}
-connectChat();
 
-// ── Render messages ──────────────────────────────────────────────
-function renderMsg(m){
-  const wrap = document.createElement('div');
-  wrap.className = 'msg-wrap ' + (m.role || 'donor');
-  wrap.innerHTML = `
+    // ── Chat SSE ─────────────────────────────────────────────────────
+    function connectChat() {
+      if (!ROOM) { setStatus('No room ID in URL'); return; }
+      const es = new EventSource(`${API}/api/stream/chat/${ROOM}`);
+      es.onmessage = e => {
+        const msg = JSON.parse(e.data);
+        if (msg.event === 'connected') {
+          setStatus('Connected · Room ' + ROOM);
+        } else if (msg.event === 'message') {
+          renderMsg(msg.data);
+        } else if (msg.event === 'system') {
+          renderSystem(msg.msg);
+          // Attempt to load route now
+          loadRoute();
+        }
+      };
+      es.onerror = () => {
+        setStatus('Reconnecting…');
+        setTimeout(connectChat, 3000);
+      };
+    }
+    connectChat();
+
+    // ── Render messages ──────────────────────────────────────────────
+    function renderMsg(m) {
+      const wrap = document.createElement('div');
+      wrap.className = 'msg-wrap ' + (m.role || 'donor');
+      wrap.innerHTML = `
     <div class="msg-bubble">${escHtml(m.text)}</div>
     <div class="msg-meta">${m.sender} · ${fmt(m.ts)}</div>`;
-  document.getElementById('messages').appendChild(wrap);
-  scrollBottom();
-}
+      document.getElementById('messages').appendChild(wrap);
+      scrollBottom();
+    }
 
-function renderSystem(text){
-  const wrap = document.createElement('div');
-  wrap.className = 'msg-wrap system';
-  wrap.innerHTML = `<div class="msg-bubble">${escHtml(text)}</div>`;
-  document.getElementById('messages').appendChild(wrap);
-  scrollBottom();
-}
+    function renderSystem(text) {
+      const wrap = document.createElement('div');
+      wrap.className = 'msg-wrap system';
+      wrap.innerHTML = `<div class="msg-bubble">${escHtml(text)}</div>`;
+      document.getElementById('messages').appendChild(wrap);
+      scrollBottom();
+    }
 
-// ── Send message ─────────────────────────────────────────────────
-async function sendMsg(){
-  const inp  = document.getElementById('chat-input');
-  const text = inp.value.trim();
-  if(!text) return;
+    // ── Send message ─────────────────────────────────────────────────
+    async function sendMsg() {
+      const inp = document.getElementById('chat-input');
+      const text = inp.value.trim();
+      if (!text) return;
 
-  const btn = document.getElementById('send-btn');
-  btn.disabled = true; inp.value = '';
+      const btn = document.getElementById('send-btn');
+      btn.disabled = true; inp.value = '';
 
-  try{
-    await fetch(`${API}/api/chat/${ROOM}`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ sender: NAME, role: ROLE, text })
+      try {
+        await fetch(`${API}/api/chat/${ROOM}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sender: NAME, role: ROLE, text })
+        });
+      } catch (e) {
+        toast('Send failed', 'err');
+      } finally {
+        btn.disabled = false;
+        inp.focus();
+      }
+    }
+
+    document.getElementById('send-btn').addEventListener('click', sendMsg);
+    document.getElementById('chat-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
     });
-  }catch(e){
-    toast('Send failed','err');
-  }finally{
-    btn.disabled = false;
-    inp.focus();
-  }
-}
 
-document.getElementById('send-btn').addEventListener('click', sendMsg);
-document.getElementById('chat-input').addEventListener('keydown', e=>{
-  if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMsg(); }
-});
+    // ── Load & draw A* route ─────────────────────────────────────────
+    let routeLoaded = false;
+    async function loadRoute() {
+      if (routeLoaded || !ROOM) return;
+      try {
+        const res = await fetch(`${API}/api/route/${ROOM}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        routeLoaded = true;
 
-// ── Load & draw A* route ─────────────────────────────────────────
-let routeLoaded = false;
-async function loadRoute(){
-  if(routeLoaded || !ROOM) return;
-  try{
-    const res = await fetch(`${API}/api/route/${ROOM}`);
-    if(!res.ok) return;
-    const data = await res.json();
-    routeLoaded = true;
+        document.getElementById('route-pending').style.display = 'none';
+        drawRoute(data);
+        toast('🗺️ Route revealed — A* computed', 'ok');
 
-    document.getElementById('route-pending').style.display = 'none';
-    drawRoute(data);
-    toast('🗺️ Route revealed — A* computed','ok');
+      } catch (e) { /* not connected yet */ }
+    }
 
-  }catch(e){ /* not connected yet */ }
-}
+    // Poll for route if recipient (donor already got it via /connect)
+    if (ROLE === 'recipient') {
+      const poll = setInterval(async () => {
+        await loadRoute();
+        if (routeLoaded) clearInterval(poll);
+      }, 3000);
+    }
+    // Donor: try immediately (route already computed server-side)
+    if (ROLE === 'donor') loadRoute();
 
-// Poll for route if recipient (donor already got it via /connect)
-if(ROLE === 'recipient'){
-  const poll = setInterval(async ()=>{
-    await loadRoute();
-    if(routeLoaded) clearInterval(poll);
-  }, 3000);
-}
-// Donor: try immediately (route already computed server-side)
-if(ROLE === 'donor') loadRoute();
+    function drawRoute(data) {
+      const route = data.route;
+      const donor = data.donor;
+      const recip = data.recipient;
+      if (!route || !route.waypoints) return;
 
-function drawRoute(data){
-  const route    = data.route;
-  const donor    = data.donor;
-  const recip    = data.recipient;
-  if(!route||!route.waypoints) return;
+      if (routeLayer) map.removeLayer(routeLayer);
 
-  if(routeLayer) map.removeLayer(routeLayer);
+      const coords = route.waypoints.map(w => [w[0], w[1]]);
+      routeLayer = L.polyline(coords, {
+        color: '#e74c3c', weight: 3.5, opacity: .9,
+        dashArray: '8 5',
+      }).addTo(map);
 
-  const coords = route.waypoints.map(w=>[w[0],w[1]]);
-  routeLayer = L.polyline(coords,{
-    color:'#e74c3c', weight:3.5, opacity:.9,
-    dashArray:'8 5',
-  }).addTo(map);
+      // Animated dot along route
+      const dotIcon = mkIcon('#e74c3c', 12);
 
-  // Animated dot along route
-  const dotIcon = mkIcon('#e74c3c',12);
+      // Donor marker
+      if (donor) {
+        L.marker([donor.lat, donor.lng], { icon: mkIcon('#42a5f5', 16) }).addTo(map)
+          .bindPopup(`🩸 ${donor.name || 'Donor'}`).openPopup();
+      }
+      // Recipient marker
+      if (recip) {
+        L.marker([recip.lat, recip.lng], { icon: mkIcon('#e74c3c', 18) }).addTo(map)
+          .bindPopup('❤️ Recipient');
+      }
 
-  // Donor marker
-  if(donor){
-    L.marker([donor.lat,donor.lng],{icon:mkIcon('#42a5f5',16)}).addTo(map)
-     .bindPopup(`🩸 ${donor.name||'Donor'}`).openPopup();
-  }
-  // Recipient marker
-  if(recip){
-    L.marker([recip.lat,recip.lng],{icon:mkIcon('#e74c3c',18)}).addTo(map)
-     .bindPopup('❤️ Recipient');
-  }
+      map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
 
-  map.fitBounds(routeLayer.getBounds(), {padding:[50,50]});
+      // Route info strip
+      const distKm = (route.distance_m / 1000).toFixed(2);
+      document.getElementById('ri-dist').textContent = distKm + ' km';
+      document.getElementById('ri-hops').textContent = route.hops;
+      document.getElementById('route-info').style.display = 'block';
 
-  // Route info strip
-  const distKm = (route.distance_m / 1000).toFixed(2);
-  document.getElementById('ri-dist').textContent = distKm + ' km';
-  document.getElementById('ri-hops').textContent = route.hops;
-  document.getElementById('route-info').style.display = 'block';
+      // Map card
+      document.getElementById('mc-donor').textContent = donor ? donor.name : 'Donor';
+      document.getElementById('mc-recip').textContent = 'Recipient';
+      document.getElementById('mc-dist').textContent = distKm + ' km';
+      document.getElementById('map-card').style.display = 'block';
+    }
 
-  // Map card
-  document.getElementById('mc-donor').textContent  = donor ? donor.name : 'Donor';
-  document.getElementById('mc-recip').textContent  = 'Recipient';
-  document.getElementById('mc-dist').textContent   = distKm + ' km';
-  document.getElementById('map-card').style.display = 'block';
-}
-
-// ── Helpers ──────────────────────────────────────────────────────
-function scrollBottom(){
-  const m = document.getElementById('messages');
-  m.scrollTop = m.scrollHeight;
-}
-function setStatus(txt){
-  document.getElementById('status-text').textContent = txt;
-}
-function fmt(iso){
-  if(!iso) return '';
-  const d = new Date(iso);
-  return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-}
-function escHtml(s){
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-function toast(msg,type='ok'){
-  const t = document.getElementById('toast');
-  t.textContent=msg; t.className='show '+(type||'');
-  setTimeout(()=>t.className='',3200);
-}
-</script>
+    // ── Helpers ──────────────────────────────────────────────────────
+    function scrollBottom() {
+      const m = document.getElementById('messages');
+      m.scrollTop = m.scrollHeight;
+    }
+    function setStatus(txt) {
+      document.getElementById('status-text').textContent = txt;
+    }
+    function fmt(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    function escHtml(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    function toast(msg, type = 'ok') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = 'show ' + (type || '');
+      setTimeout(() => t.className = '', 3200);
+    }
+  </script>
 </body>
-</html>
 
+</html>
