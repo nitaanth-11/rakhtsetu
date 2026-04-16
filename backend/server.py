@@ -37,7 +37,7 @@ from cryptography.fernet import Fernet
 from flask import Flask, Response, jsonify, request, stream_with_context
 from flask_cors import CORS
 
-from backend.data_loader import (
+from data_loader import (
     astar_route,
     load_ambulances,
     load_blood_banks,
@@ -184,9 +184,13 @@ def api_ambulances():
             trip_m = haversine(lat, lng, float(drop_lat), float(drop_lng))
             trip_km = round(trip_m / 1000, 2)
             u["trip_km"] = trip_km
-            u["total_cost"] = round(u["cost_per_km"] * trip_km, 2)
+            
+            # Cost covers the entire run (base → pickup → dropoff)
+            total_dist_km = u["distance_km"] + trip_km
+            u["total_cost"] = round(u["cost_per_km"] * total_dist_km, 2)
+            
             # ETA for full trip: ambulance→pickup + pickup→dropoff
-            trip_eta = round((trip_km / AVG_SPEED_KMH) * 60)
+            trip_eta = round((total_dist_km / AVG_SPEED_KMH) * 60)
             u["trip_eta_min"] = max(trip_eta, 3)
 
     return jsonify({"ambulances": units})
@@ -384,7 +388,22 @@ def connect_donor():
     if rec["status"] != "open":
         return jsonify({"error": "Request already fulfilled or connected"}), 409
 
-    # ── 100-day cooldown check ──
+    donor_blood_type = str(body.get("donor_blood_type", "")).strip().upper()
+    recipient_blood_type = str(rec.get("blood_type", "")).strip().upper()
+
+    if not donor_blood_type:
+        return jsonify({"error": "donor_blood_type is required"}), 400
+
+    compatible_recipients = BLOOD_COMPATIBLE.get(donor_blood_type, [])
+    if recipient_blood_type not in compatible_recipients:
+        return jsonify({
+            "error": f"Incompatible blood types: donor {donor_blood_type} cannot donate to recipient {recipient_blood_type}",
+            "donor_blood_type": donor_blood_type,
+            "recipient_blood_type": recipient_blood_type,
+            "compatible_recipients": compatible_recipients,
+            "is_compatible": False,
+        }), 400
+
     donor_id = body.get("donor_id", "").upper() if body.get("donor_id") else ""
     if donor_id:
         donor_history = [d for d in _donations if d["donor_id"] == donor_id]
@@ -404,7 +423,6 @@ def connect_donor():
     donor_lat = float(body["donor_lat"])
     donor_lng = float(body["donor_lng"])
 
-    # Decrypt recipient location
     try:
         recipient_coords = decrypt_coords(rec["encrypted_loc"])
     except Exception:
@@ -413,57 +431,65 @@ def connect_donor():
     r_lat = recipient_coords["lat"]
     r_lng = recipient_coords["lng"]
 
-    # Run A* from donor → recipient
     route = astar_route(donor_lat, donor_lng, r_lat, r_lng)
 
-    # Cache route
     _routes[req_id] = {
-        "donor":     {"lat": donor_lat, "lng": donor_lng, "name": body.get("donor_name", "Donor")},
-        "recipient": {"lat": r_lat, "lng": r_lng},
-        "route":     route,
+        "donor": {
+            "lat": donor_lat,
+            "lng": donor_lng,
+            "name": body.get("donor_name", "Donor"),
+            "blood_type": donor_blood_type,
+        },
+        "recipient": {
+            "lat": r_lat,
+            "lng": r_lng,
+            "blood_type": recipient_blood_type,
+        },
+        "route": route,
         "connected_at": datetime.utcnow().isoformat() + "Z",
     }
 
-    # Update request status
     _requests[req_id]["status"] = "connected"
 
-    # ── Record donation naturally ──
     donation_record = {
-        "id":          str(uuid.uuid4())[:8].upper(),
-        "donor_id":    donor_id,
-        "donor_name":  body.get("donor_name", "Donor"),
-        "req_id":      req_id,
-        "recipient":   rec["name"],
-        "blood_type":  rec["blood_type"],
-        "location":    rec.get("address_label", "Undisclosed"),
-        "date":        datetime.utcnow().isoformat() + "Z",
-        "status":      "ok",
-        "units":       450,
-        "type":        "Whole Blood",
+        "id": str(uuid.uuid4())[:8].upper(),
+        "donor_id": donor_id,
+        "donor_name": body.get("donor_name", "Donor"),
+        "req_id": req_id,
+        "recipient": rec["name"],
+        "blood_type": rec["blood_type"],
+        "location": rec.get("address_label", "Undisclosed"),
+        "date": datetime.utcnow().isoformat() + "Z",
+        "status": "ok",
+        "units": 450,
+        "type": "Whole Blood",
     }
     _donations.append(donation_record)
 
-    # Notify feed
     _push_feed_event({
         "event": "request_connected",
-        "data":  {"req_id": req_id, "donor_name": body.get("donor_name", "Donor")},
+        "data": {
+            "req_id": req_id,
+            "donor_name": body.get("donor_name", "Donor"),
+        },
     })
 
-    # Notify chat room
     _push_chat_event(req_id, {
         "event": "system",
-        "msg":   f"✅ {body.get('donor_name','Donor')} has connected. Route revealed.",
-        "ts":    datetime.utcnow().isoformat() + "Z",
+        "msg": f"✅ {body.get('donor_name', 'Donor')} has connected. Route revealed.",
+        "ts": datetime.utcnow().isoformat() + "Z",
     })
 
     return jsonify({
-        "req_id":           req_id,
+        "req_id": req_id,
         "recipient_coords": {"lat": r_lat, "lng": r_lng},
-        "route":            route,
-        "room_id":          req_id,
-        "donation":         donation_record,
+        "route": route,
+        "room_id": req_id,
+        "donation": donation_record,
+        "is_compatible": True,
+        "donor_blood_type": donor_blood_type,
+        "recipient_blood_type": recipient_blood_type,
     })
-
 
 @app.route("/api/route/<req_id>")
 def get_route(req_id):
@@ -570,6 +596,6 @@ _seed_demo()
 # ─────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print("🩸 RakhtSetu server running → https://rakhtsetu-1.onrender.com")
+    print("RakhtSetu server running -> https://rakhtsetu-1.onrender.com")
     print(f"   Fernet key (save this): {_FERNET_KEY}")
     app.run(debug=True, threaded=True, port=5000)

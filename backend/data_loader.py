@@ -89,7 +89,8 @@ def haversine(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
 
 def nearest_blood_banks(lat: float, lng: float, n: int = 5) -> List[Dict]:
     """Return the N closest blood banks to (lat, lng), sorted by distance."""
-    banks = load_blood_banks()
+    import copy
+    banks = copy.deepcopy(load_blood_banks())
     for b in banks:
         b["distance_m"] = haversine(lat, lng, b["lat"], b["lng"])
     return sorted(banks, key=lambda x: x["distance_m"])[:n]
@@ -102,7 +103,8 @@ def nearest_ambulances(lat: float, lng: float, n: int = 3,
     distance_km and total_cost (cost_per_km × distance_km).
     Pass unit_type='ambulance' or 'mobile_van' to filter.
     """
-    units = load_ambulances()
+    import copy
+    units = copy.deepcopy(load_ambulances())
     if unit_type:
         units = [u for u in units if u["type"] == unit_type]
     for u in units:

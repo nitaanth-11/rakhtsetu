@@ -430,10 +430,13 @@ document.getElementById('submit-btn').addEventListener('click', async ()=>{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
-        name, blood_type:blood, urgency,
-        lat:userLat, lng:userLng,
-        address_label: label || 'Undisclosed'
-      })
+        name: name,
+        blood_type: blood,
+        urgency: urgency,
+        lat: userLat,
+        lng: userLng,
+        address_label: label || "Undisclosed"
+      }),
     });
     const data = await res.json();
     if(!res.ok) throw new Error(data.error||'Server error');
@@ -454,7 +457,7 @@ function showResult(data){
 
   const bankList = document.getElementById('r-banks');
   bankList.innerHTML='';
-  (data.nearby_banks||[]).forEach(b=>{
+  data.nearby_banks.forEach(b => {
     const li=document.createElement('li');
     li.innerHTML=`<span>${b.name}</span>
       <span class="nearby-dist">${(b.distance_m/1000).toFixed(1)} km</span>`;
@@ -463,7 +466,7 @@ function showResult(data){
 
   const ambList = document.getElementById('r-ambs');
   ambList.innerHTML='';
-  (data.nearby_ambs||[]).forEach(a=>{
+  data.nearby_ambs.forEach(a => {
     const li=document.createElement('li');
     li.innerHTML=`<span>${a.name}</span>
       <span class="nearby-dist">${(a.distance_m/1000).toFixed(1)} km</span>`;

@@ -1,370 +1,582 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RakhtSetu · Register as Donor</title>
-<meta name="description" content="Register as a blood donor on RakhtSetu — Mumbai's live blood donation network. Save lives with a single tap.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{
-  --red:#c0392b;--red-b:#e74c3c;--red-d:#7b1c1c;
-  --red-glow:rgba(192,57,43,.35);
-  --bg:#080b0e;--panel:#0e1318;--panel2:#141b22;--panel3:#1a232e;
-  --border:#1e2a35;--text:#d4dde8;--muted:#566879;
-  --green:#1b5e20;--green-b:#43a047;
-  --mono:'Share Tech Mono',monospace;
-  --head:'Rajdhani',sans-serif;
-  --body:'Inter',sans-serif;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{
-  min-height:100vh;
-  background:var(--bg);
-  color:var(--text);
-  font-family:var(--body);
-  display:flex;align-items:center;justify-content:center;
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -15%, rgba(192,57,43,.15) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 40% at 100% 100%, rgba(13,71,161,.06) 0%, transparent 60%);
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RakhtSetu · Register as Donor</title>
+  <meta name="description"
+    content="Register as a blood donor on RakhtSetu — Mumbai's live blood donation network. Save lives with a single tap.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --red: #c0392b;
+      --red-b: #e74c3c;
+      --red-d: #7b1c1c;
+      --red-glow: rgba(192, 57, 43, .35);
+      --bg: #080b0e;
+      --panel: #0e1318;
+      --panel2: #141b22;
+      --panel3: #1a232e;
+      --border: #1e2a35;
+      --text: #d4dde8;
+      --muted: #566879;
+      --green: #1b5e20;
+      --green-b: #43a047;
+      --mono: 'Share Tech Mono', monospace;
+      --head: 'Rajdhani', sans-serif;
+      --body: 'Inter', sans-serif;
+    }
 
-/* ── Card container ── */
-.register-shell{
-  width:440px;max-width:94vw;
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:10px;
-  overflow:hidden;
-  position:relative;
-  animation:cardIn .5s ease;
-  box-shadow:0 8px 48px rgba(0,0,0,.4), 0 0 0 1px rgba(192,57,43,.06);
-}
-@keyframes cardIn{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
 
-.register-shell::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg, transparent, var(--red-b), var(--red-d), transparent);
-}
+    html {
+      scroll-behavior: smooth
+    }
 
-/* ── Header ── */
-.reg-header{
-  padding:32px 32px 24px;
-  text-align:center;
-  background:linear-gradient(180deg, rgba(192,57,43,.06), transparent);
-  border-bottom:1px solid var(--border);
-}
-.reg-logo{
-  font-family:var(--head);font-size:1.6rem;font-weight:700;
-  color:var(--red-b);letter-spacing:4px;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-}
-.live-dot{
-  width:8px;height:8px;background:var(--red-b);border-radius:50%;
-  box-shadow:0 0 0 0 var(--red-glow);
-  animation:pulse 1.5s infinite;flex-shrink:0;
-}
-@keyframes pulse{
-  0%{box-shadow:0 0 0 0 var(--red-glow)}
-  70%{box-shadow:0 0 0 8px rgba(0,0,0,0)}
-  100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}
-}
-.reg-tagline{
-  font-family:var(--mono);font-size:.65rem;color:var(--muted);
-  letter-spacing:2px;margin-top:6px;
-}
-.reg-icon{
-  font-size:2.4rem;margin-bottom:10px;
-  display:block;
-}
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -15%, rgba(192, 57, 43, .15) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 100% 100%, rgba(13, 71, 161, .06) 0%, transparent 60%);
+    }
 
-/* ── Form body ── */
-.reg-body{
-  padding:28px 32px 32px;
-}
+    /* ── Card container ── */
+    .register-shell {
+      width: 440px;
+      max-width: 94vw;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      animation: cardIn .5s ease;
+      box-shadow: 0 8px 48px rgba(0, 0, 0, .4), 0 0 0 1px rgba(192, 57, 43, .06);
+    }
 
-.section-label{
-  font-family:var(--mono);font-size:.6rem;letter-spacing:2.5px;
-  color:var(--red-b);text-transform:uppercase;margin-bottom:14px;
-  display:flex;align-items:center;gap:8px;
-}
-.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(.97)
+      }
 
-.field{margin-bottom:16px}
-.field label{
-  display:block;font-family:var(--mono);font-size:.63rem;
-  color:var(--muted);letter-spacing:1.5px;margin-bottom:6px;
-  text-transform:uppercase;
-}
-.field input,.field select{
-  width:100%;padding:11px 14px;
-  background:var(--panel2);border:1px solid var(--border);
-  color:var(--text);font-family:var(--body);font-size:.9rem;
-  border-radius:4px;transition:border-color .2s,box-shadow .2s;
-  appearance:none;
-}
-.field input:focus,.field select:focus{
-  outline:none;border-color:var(--red-d);
-  box-shadow:0 0 0 3px rgba(192,57,43,.12);
-}
-.field select option{background:#1a242f}
-.field input::placeholder{color:var(--muted);opacity:.7}
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
 
-.row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .register-shell::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--red-b), var(--red-d), transparent);
+    }
 
-/* GPS button */
-.btn-gps{
-  width:100%;padding:11px;margin-bottom:6px;
-  background:transparent;border:1px solid var(--border);
-  color:var(--muted);border-radius:4px;cursor:pointer;
-  font-family:var(--mono);font-size:.72rem;letter-spacing:1px;
-  transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;
-}
-.btn-gps:hover{border-color:var(--red-d);color:var(--text)}
-.btn-gps.captured{border-color:var(--green);color:var(--green-b)}
+    /* ── Header ── */
+    .reg-header {
+      padding: 32px 32px 24px;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(192, 57, 43, .06), transparent);
+      border-bottom: 1px solid var(--border);
+    }
 
-.loc-display{
-  font-family:var(--mono);font-size:.72rem;color:var(--muted);
-  text-align:center;margin-bottom:6px;min-height:20px;
-}
-.loc-display.active{color:var(--green-b)}
+    .reg-logo {
+      font-family: var(--head);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--red-b);
+      letter-spacing: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
 
-/* Submit */
-.btn-register{
-  width:100%;padding:14px;margin-top:12px;
-  background:var(--red);border:none;color:#fff;
-  font-family:var(--head);font-size:1.05rem;font-weight:700;
-  letter-spacing:3px;text-transform:uppercase;
-  border-radius:4px;cursor:pointer;transition:.25s;
-  position:relative;overflow:hidden;
-}
-.btn-register:hover{background:var(--red-b);box-shadow:0 0 24px var(--red-glow)}
-.btn-register:active{transform:scale(.99)}
-.btn-register::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);
-  transform:translateX(-100%);
-}
-.btn-register:hover::after{animation:shimmer .6s ease forwards}
-@keyframes shimmer{to{transform:translateX(100%)}}
-.btn-register:disabled{opacity:.5;cursor:not-allowed}
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--red-b);
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 var(--red-glow);
+      animation: pulse 1.5s infinite;
+      flex-shrink: 0;
+    }
 
-/* Footer link */
-.reg-footer{
-  text-align:center;padding:18px 32px 24px;
-  border-top:1px solid var(--border);
-}
-.reg-footer a{
-  font-family:var(--mono);font-size:.68rem;color:var(--muted);
-  text-decoration:none;letter-spacing:1px;transition:.2s;
-}
-.reg-footer a:hover{color:var(--red-b)}
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 var(--red-glow)
+      }
 
-/* ── Toast ── */
-#toast{
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(14px);
-  background:var(--panel2);border:1px solid var(--border);padding:12px 22px;
-  border-radius:3px;font-family:var(--mono);font-size:.75rem;
-  opacity:0;transition:.35s;z-index:9999;pointer-events:none;
-  max-width:380px;text-align:center;
-}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-#toast.ok{border-color:#2e7d32;color:var(--green-b)}
-#toast.err{border-color:var(--red-d);color:var(--red-b)}
+      70% {
+        box-shadow: 0 0 0 8px rgba(0, 0, 0, 0)
+      }
 
-/* ── Responsive ── */
-@media(max-width:480px){
-  .register-shell{border-radius:0;min-height:100vh}
-  .reg-body{padding:24px 20px 28px}
-}
-</style>
+      100% {
+        box-shadow: 0 0 0 0 rgba(0, 0, 0, 0)
+      }
+    }
+
+    .reg-tagline {
+      font-family: var(--mono);
+      font-size: .65rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      margin-top: 6px;
+    }
+
+    .reg-icon {
+      font-size: 2.4rem;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    /* ── Form body ── */
+    .reg-body {
+      padding: 28px 32px 32px;
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: .6rem;
+      letter-spacing: 2.5px;
+      color: var(--red-b);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border)
+    }
+
+    .field {
+      margin-bottom: 16px
+    }
+
+    .field label {
+      display: block;
+      font-family: var(--mono);
+      font-size: .63rem;
+      color: var(--muted);
+      letter-spacing: 1.5px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--body);
+      font-size: .9rem;
+      border-radius: 4px;
+      transition: border-color .2s, box-shadow .2s;
+      appearance: none;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--red-d);
+      box-shadow: 0 0 0 3px rgba(192, 57, 43, .12);
+    }
+
+    .field select option {
+      background: #1a242f
+    }
+
+    .field input::placeholder {
+      color: var(--muted);
+      opacity: .7
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px
+    }
+
+    /* GPS button */
+    .btn-gps {
+      width: 100%;
+      padding: 11px;
+      margin-bottom: 6px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: .72rem;
+      letter-spacing: 1px;
+      transition: .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-gps:hover {
+      border-color: var(--red-d);
+      color: var(--text)
+    }
+
+    .btn-gps.captured {
+      border-color: var(--green);
+      color: var(--green-b)
+    }
+
+    .loc-display {
+      font-family: var(--mono);
+      font-size: .72rem;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 6px;
+      min-height: 20px;
+    }
+
+    .loc-display.active {
+      color: var(--green-b)
+    }
+
+    /* Submit */
+    .btn-register {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      background: var(--red);
+      border: none;
+      color: #fff;
+      font-family: var(--head);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: .25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-register:hover {
+      background: var(--red-b);
+      box-shadow: 0 0 24px var(--red-glow)
+    }
+
+    .btn-register:active {
+      transform: scale(.99)
+    }
+
+    .btn-register::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .08), transparent);
+      transform: translateX(-100%);
+    }
+
+    .btn-register:hover::after {
+      animation: shimmer .6s ease forwards
+    }
+
+    @keyframes shimmer {
+      to {
+        transform: translateX(100%)
+      }
+    }
+
+    .btn-register:disabled {
+      opacity: .5;
+      cursor: not-allowed
+    }
+
+    /* Footer link */
+    .reg-footer {
+      text-align: center;
+      padding: 18px 32px 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .reg-footer a {
+      font-family: var(--mono);
+      font-size: .68rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 1px;
+      transition: .2s;
+    }
+
+    .reg-footer a:hover {
+      color: var(--red-b)
+    }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(14px);
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      padding: 12px 22px;
+      border-radius: 3px;
+      font-family: var(--mono);
+      font-size: .75rem;
+      opacity: 0;
+      transition: .35s;
+      z-index: 9999;
+      pointer-events: none;
+      max-width: 380px;
+      text-align: center;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
+    }
+
+    #toast.ok {
+      border-color: #2e7d32;
+      color: var(--green-b)
+    }
+
+    #toast.err {
+      border-color: var(--red-d);
+      color: var(--red-b)
+    }
+
+    /* ── Responsive ── */
+    @media(max-width:480px) {
+      .register-shell {
+        border-radius: 0;
+        min-height: 100vh
+      }
+
+      .reg-body {
+        padding: 24px 20px 28px
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="register-shell">
+  <div class="register-shell">
 
-  <div class="reg-header">
-    <span class="reg-icon">🩸</span>
-    <div class="reg-logo"><span class="live-dot"></span> RAKHTSETU</div>
-    <div class="reg-tagline">DONOR REGISTRATION · MUMBAI BLOOD GRID</div>
+    <div class="reg-header">
+      <span class="reg-icon">🩸</span>
+      <div class="reg-logo"><span class="live-dot"></span> RAKHTSETU</div>
+      <div class="reg-tagline">DONOR REGISTRATION · MUMBAI BLOOD GRID</div>
+    </div>
+
+    <form id="registerForm" class="reg-body" autocomplete="off">
+
+      <div class="section-label">PERSONAL DETAILS</div>
+
+      <div class="field">
+        <label>FULL NAME</label>
+        <input type="text" id="r-name" placeholder="Enter your full name" required>
+      </div>
+
+      <div class="row-2">
+        <div class="field">
+          <label>AGE</label>
+          <input type="number" id="r-age" placeholder="Age" min="18" max="65" required>
+        </div>
+        <div class="field">
+          <label>BLOOD TYPE</label>
+          <select id="r-blood" required>
+            <option value="">Select</option>
+            <option>A+</option>
+            <option>A-</option>
+            <option>B+</option>
+            <option>B-</option>
+            <option>O+</option>
+            <option>O-</option>
+            <option>AB+</option>
+            <option>AB-</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-label" style="margin-top:6px">CONTACT & SECURITY</div>
+
+      <div class="field">
+        <label>PHONE NUMBER</label>
+        <input type="tel" id="r-phone" placeholder="10-digit mobile number" required>
+      </div>
+
+      <div class="field">
+        <label>PASSWORD</label>
+        <input type="password" id="r-password" placeholder="Create a password" required>
+      </div>
+
+      <div class="section-label" style="margin-top:6px">LOCATION</div>
+
+      <button type="button" class="btn-gps" id="gps-btn">
+        📍 DETECT MY LOCATION
+      </button>
+      <div class="loc-display" id="loc-display">Click to auto-detect GPS location</div>
+      <input type="hidden" id="r-lat">
+      <input type="hidden" id="r-lng">
+
+      <button type="submit" class="btn-register" id="submit-btn">
+        REGISTER AS DONOR →
+      </button>
+
+    </form>
+
+    <div class="reg-footer">
+      <a href="dashboard.html">Already registered? Go to Live Feed →</a>
+    </div>
+
   </div>
 
-  <form id="registerForm" class="reg-body" autocomplete="off">
+  <div id="toast"></div>
 
-    <div class="section-label">PERSONAL DETAILS</div>
+  <script>
+    const API = "";
 
-    <div class="field">
-      <label>FULL NAME</label>
-      <input type="text" id="r-name" placeholder="Enter your full name" required>
-    </div>
-
-    <div class="row-2">
-      <div class="field">
-        <label>AGE</label>
-        <input type="number" id="r-age" placeholder="Age" min="18" max="65" required>
-      </div>
-      <div class="field">
-        <label>BLOOD TYPE</label>
-        <select id="r-blood" required>
-          <option value="">Select</option>
-          <option>A+</option><option>A-</option>
-          <option>B+</option><option>B-</option>
-          <option>O+</option><option>O-</option>
-          <option>AB+</option><option>AB-</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="section-label" style="margin-top:6px">CONTACT & SECURITY</div>
-
-    <div class="field">
-      <label>PHONE NUMBER</label>
-      <input type="tel" id="r-phone" placeholder="10-digit mobile number" required>
-    </div>
-
-    <div class="field">
-      <label>PASSWORD</label>
-      <input type="password" id="r-password" placeholder="Create a password" required>
-    </div>
-
-    <div class="section-label" style="margin-top:6px">LOCATION</div>
-
-    <button type="button" class="btn-gps" id="gps-btn">
-      📍 DETECT MY LOCATION
-    </button>
-    <div class="loc-display" id="loc-display">Click to auto-detect GPS location</div>
-    <input type="hidden" id="r-lat">
-    <input type="hidden" id="r-lng">
-
-    <button type="submit" class="btn-register" id="submit-btn">
-      REGISTER AS DONOR →
-    </button>
-
-  </form>
-
-  <div class="reg-footer">
-    <a href="dashboard.html">Already registered? Go to Live Feed →</a>
-  </div>
-
-</div>
-
-<div id="toast"></div>
-
-<script>
-const API = ""; // Use relative URLs for seamless local/production deployment
-
-// ── If already registered, redirect ──
-const existingDonor = JSON.parse(localStorage.getItem('donor') || 'null');
-if(existingDonor && existingDonor.id){
-  window.location.href = 'dashboard.html';
-}
-
-// ── GPS ──
-let gpsLat = null, gpsLng = null;
-
-document.getElementById('gps-btn').addEventListener('click', ()=>{
-  if(!navigator.geolocation){ toast('GPS not supported by your browser','err'); return; }
-  const btn = document.getElementById('gps-btn');
-  btn.textContent = '📡 FETCHING…'; btn.disabled = true;
-  navigator.geolocation.getCurrentPosition(
-    p => {
-      gpsLat = p.coords.latitude;
-      gpsLng = p.coords.longitude;
-      document.getElementById('r-lat').value = gpsLat;
-      document.getElementById('r-lng').value = gpsLng;
-      const loc = document.getElementById('loc-display');
-      loc.textContent = `${gpsLat.toFixed(5)}, ${gpsLng.toFixed(5)}`;
-      loc.classList.add('active');
-      btn.textContent = '✓ LOCATION CAPTURED';
-      btn.classList.add('captured');
-      btn.disabled = false;
-    },
-    e => {
-      toast('GPS error: ' + e.message, 'err');
-      btn.textContent = '📍 DETECT MY LOCATION'; btn.disabled = false;
-    },
-    { enableHighAccuracy: true }
-  );
-});
-
-// ── Submit ──
-document.getElementById('registerForm').addEventListener('submit', async (e)=>{
-  e.preventDefault();
-
-  const name     = document.getElementById('r-name').value.trim();
-  const age      = parseInt(document.getElementById('r-age').value);
-  const blood    = document.getElementById('r-blood').value;
-  const phone    = document.getElementById('r-phone').value.trim();
-  const password = document.getElementById('r-password').value;
-  const lat      = parseFloat(document.getElementById('r-lat').value);
-  const lng      = parseFloat(document.getElementById('r-lng').value);
-
-  if(!name){ toast('Please enter your name','err'); return; }
-  if(!age || age < 18 || age > 65){ toast('Age must be between 18 and 65','err'); return; }
-  if(!blood){ toast('Select your blood type','err'); return; }
-  if(!phone || phone.length < 10){ toast('Enter a valid 10-digit phone number','err'); return; }
-  if(!password || password.length < 4){ toast('Password must be at least 4 characters','err'); return; }
-  if(!lat || !lng){ toast('Please detect your GPS location','err'); return; }
-
-  const btn = document.getElementById('submit-btn');
-  btn.textContent = 'REGISTERING…'; btn.disabled = true;
-
-  try{
-    const res = await fetch(`${API}/api/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name, age, blood_type: blood,
-        phone, password,
-        latitude: lat, longitude: lng
-      })
-    });
-    const data = await res.json();
-
-    if(!res.ok){
-      throw new Error(data.error || 'Registration failed');
-    }
-
-    // Save donor profile to localStorage (including donor_id)
-    const donorProfile = {
-      id:         data.donor_id,
-      name:       name,
-      age:        age,
-      blood_type: blood,
-      phone:      phone,
-      latitude:   lat,
-      longitude:  lng,
-      available:  true,
-      registered_at: data.donor.registered_at
-    };
-    localStorage.setItem('donor', JSON.stringify(donorProfile));
-
-    // Initialise empty donation history
-    if(!localStorage.getItem('donationHistory')){
-      localStorage.setItem('donationHistory', JSON.stringify([]));
-    }
-
-    toast('✓ Registration successful! Redirecting…','ok');
-
-    setTimeout(()=>{
+    // ── If already registered, redirect ──
+    const existingDonor = JSON.parse(localStorage.getItem('donor') || 'null');
+    if (existingDonor && existingDonor.id) {
       window.location.href = 'dashboard.html';
-    }, 1400);
+    }
 
-  }catch(e){
-    toast('Error: ' + e.message, 'err');
-    btn.textContent = 'REGISTER AS DONOR →'; btn.disabled = false;
-  }
-});
+    // ── GPS ──
+    let gpsLat = null, gpsLng = null;
 
-// ── Toast ──
-function toast(msg, type='ok'){
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'show ' + (type || '');
-  setTimeout(()=> t.className = '', 3500);
-}
-</script>
+    document.getElementById('gps-btn').addEventListener('click', () => {
+      if (!navigator.geolocation) { toast('GPS not supported by your browser', 'err'); return; }
+      const btn = document.getElementById('gps-btn');
+      btn.textContent = '📡 FETCHING…'; btn.disabled = true;
+      navigator.geolocation.getCurrentPosition(
+        p => {
+          gpsLat = p.coords.latitude;
+          gpsLng = p.coords.longitude;
+          document.getElementById('r-lat').value = gpsLat;
+          document.getElementById('r-lng').value = gpsLng;
+          const loc = document.getElementById('loc-display');
+          loc.textContent = `${gpsLat.toFixed(5)}, ${gpsLng.toFixed(5)}`;
+          loc.classList.add('active');
+          btn.textContent = '✓ LOCATION CAPTURED';
+          btn.classList.add('captured');
+          btn.disabled = false;
+        },
+        e => {
+          toast('GPS error: ' + e.message, 'err');
+          btn.textContent = '📍 DETECT MY LOCATION'; btn.disabled = false;
+        },
+        { enableHighAccuracy: true }
+      );
+    });
+
+    // ── Submit ──
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('r-name').value.trim();
+      const age = parseInt(document.getElementById('r-age').value);
+      const blood = document.getElementById('r-blood').value;
+      const phone = document.getElementById('r-phone').value.trim();
+      const password = document.getElementById('r-password').value;
+      const lat = parseFloat(document.getElementById('r-lat').value);
+      const lng = parseFloat(document.getElementById('r-lng').value);
+
+      if (!name) { toast('Please enter your name', 'err'); return; }
+      if (!age || age < 18 || age > 65) { toast('Age must be between 18 and 65', 'err'); return; }
+      if (!blood) { toast('Select your blood type', 'err'); return; }
+      if (!phone || phone.length < 10) { toast('Enter a valid 10-digit phone number', 'err'); return; }
+      if (!password || password.length < 4) { toast('Password must be at least 4 characters', 'err'); return; }
+      if (!lat || !lng) { toast('Please detect your GPS location', 'err'); return; }
+
+      const btn = document.getElementById('submit-btn');
+      btn.textContent = 'REGISTERING…'; btn.disabled = true;
+
+      try {
+        const res = await fetch(`${API}/api/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name,
+            age: age,
+            blood_type: blood,
+            phone: phone,
+            password: password,
+            latitude: lat,
+            longitude: lng
+          }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Registration failed');
+        }
+
+        // Save donor profile to localStorage (including donor_id)
+        const donorProfile = {
+          id: data.donor_id,
+          name: name,
+          age: age,
+          blood_type: blood,
+          phone: phone,
+          latitude: lat,
+          longitude: lng,
+          available: true,
+          registered_at: data.donor.registered_at
+        };
+        localStorage.setItem('donor', JSON.stringify(donorProfile));
+
+        // Initialise empty donation history
+        if (!localStorage.getItem('donationHistory')) {
+          localStorage.setItem('donationHistory', JSON.stringify([]));
+        }
+
+        toast('✓ Registration successful! Redirecting…', 'ok');
+
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1400);
+
+      } catch (e) {
+        toast('Error: ' + e.message, 'err');
+        btn.textContent = 'REGISTER AS DONOR →'; btn.disabled = false;
+      }
+    });
+
+    // ── Toast ──
+    function toast(msg, type = 'ok') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = 'show ' + (type || '');
+      setTimeout(() => t.className = '', 3500);
+    }
+  </script>
 </body>
-</html>
 
+</html>

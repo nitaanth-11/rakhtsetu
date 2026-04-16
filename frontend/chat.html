@@ -579,9 +579,18 @@
     }
 
     // ── Chat SSE ─────────────────────────────────────────────────────
+    const _renderedIds = new Set();   // prevent duplicate message rendering
+    let _chatES = null;               // current EventSource instance
+
     function connectChat() {
       if (!ROOM) { setStatus('No room ID in URL'); return; }
+
+      // Close any previous connection to prevent parallel streams
+      if (_chatES) { _chatES.close(); _chatES = null; }
+
       const es = new EventSource(`${API}/api/stream/chat/${ROOM}`);
+      _chatES = es;
+
       es.onmessage = e => {
         const msg = JSON.parse(e.data);
         if (msg.event === 'connected') {
@@ -595,6 +604,8 @@
         }
       };
       es.onerror = () => {
+        es.close();
+        _chatES = null;
         setStatus('Reconnecting…');
         setTimeout(connectChat, 3000);
       };
@@ -603,6 +614,10 @@
 
     // ── Render messages ──────────────────────────────────────────────
     function renderMsg(m) {
+      // Skip if we already rendered this exact message
+      if (m.id && _renderedIds.has(m.id)) return;
+      if (m.id) _renderedIds.add(m.id);
+
       const wrap = document.createElement('div');
       wrap.className = 'msg-wrap ' + (m.role || 'donor');
       wrap.innerHTML = `

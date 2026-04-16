@@ -1332,10 +1332,12 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            req_id: reqId, donor_name: name,
+            req_id: reqId,
+            donor_name: name,
             donor_blood_type: blood,
-            donor_lat: lat, donor_lng: lng,
-            donor_id: donor ? donor.id : '',
+            donor_lat: lat,
+            donor_lng: lng,
+            donor_id: donor ? donor.id : ""
           })
         });
         const data = await res.json();
